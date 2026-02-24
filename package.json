@@ -1,0 +1,21 @@
+{
+  "name": "a-freelancer-marketplace",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "prepare": "husky",
+    "format": "oxfmt"
+  },
+  "lint-staged": {
+    "*": "oxfmt --no-error-on-unmatched-pattern"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "oxfmt": "^0.35.0"
+  }
+}
