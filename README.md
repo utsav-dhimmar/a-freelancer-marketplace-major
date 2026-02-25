@@ -1,6 +1,6 @@
 # Freelancer Marketplace
 
-A full-stack freelancer marketplace application built with Node.js, Express, MongoDB, and Angular.
+A full-stack freelancer marketplace application built with Node.js, Express, MongoDB, and React.
 
 ## Project Structure
 
