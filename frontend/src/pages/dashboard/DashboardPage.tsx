@@ -130,7 +130,12 @@ export function DashboardPage() {
 
         <div className="col-md-6">
           <Card title="Recent Activity">
-            <Link to="/dashboard/proposals">View My Proposals</Link>
+            {user?.role === 'freelancer' && (
+              <Link to="/dashboard/proposals">View My Proposals</Link>
+            )}
+            {user?.role === 'client' && (
+              <Link to="/dashboard/jobs">View My Jobs</Link>
+            )}
             <br />
             <Link to="/dashboard/contracts">View My Contracts</Link>
           </Card>
