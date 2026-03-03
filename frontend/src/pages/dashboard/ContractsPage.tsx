@@ -27,9 +27,10 @@ export function ContractsPage() {
       const data = await contractApi.getMyContracts();
       setContracts(data);
 
-      const jobIds = [...new Set(data.map((c) => c.jobId))];
+      const jobIds = Array.from(new Set<string>(data.map((c: IContract) => String(c.jobId))));
       const jobData: Record<string, IJob> = {};
       for (const jobId of jobIds) {
+        if (!jobId) continue;
         try {
           const job = await jobApi.getById(jobId);
           jobData[jobId] = job;
@@ -88,22 +89,11 @@ export function ContractsPage() {
     }
   };
 
-  const handleCancel = async (id: string) => {
-    if (!confirm('Are you sure you want to cancel this contract?')) return;
-    try {
-      await contractApi.cancelContract(id);
-      loadContracts();
-    } catch (error) {
-      console.error('Failed to cancel contract:', error);
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     const classes: Record<string, string> = {
       active: 'bg-primary',
       completed: 'bg-success',
       disputed: 'bg-danger',
-      cancelled: 'bg-secondary',
     };
     return (
       <span className={`badge ${classes[status] || 'bg-secondary'}`}>
@@ -183,20 +173,10 @@ export function ContractsPage() {
                           Mark Complete
                         </Button>
                       )}
-                      <Button
-                        size="sm"
-                        variant="outline-danger"
-                        onClick={() => handleCancel(contract._id)}
-                      >
-                        Cancel
-                      </Button>
                     </>
                   )}
                   {contract.status === 'completed' && (
                     <span className="text-success">Contract completed</span>
-                  )}
-                  {contract.status === 'cancelled' && (
-                    <span className="text-muted">Contract cancelled</span>
                   )}
                   {contract.status === 'disputed' && (
                     <span className="text-danger">Under dispute</span>

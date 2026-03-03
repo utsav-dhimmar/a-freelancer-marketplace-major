@@ -222,8 +222,8 @@ export const freelancerApi = {
     return response.data.data.freelancer;
   },
 
-  update: async (id: string, data: Partial<IFreelancer>) => {
-    const response = await api.put<ApiResponse<{ freelancer: IFreelancer }>>(`/freelancers/${id}`, data);
+  update: async (_id: string, data: Partial<IFreelancer>) => {
+    const response = await api.put<ApiResponse<{ freelancer: IFreelancer }>>(`/freelancers`, data);
     return response.data.data.freelancer;
   },
 
@@ -278,17 +278,17 @@ export const proposalApi = {
   },
 
   withdraw: async (id: string) => {
-    const response = await api.post<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/withdraw`);
-    return response.data.data.proposal;
+    const response = await api.delete<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}`);
+    return response.data?.data?.proposal || null;
   },
 
   accept: async (id: string) => {
-    const response = await api.put<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/accept`);
+    const response = await api.patch<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/status`, { status: 'accepted' });
     return response.data.data.proposal;
   },
 
   reject: async (id: string) => {
-    const response = await api.put<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/reject`);
+    const response = await api.patch<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/status`, { status: 'rejected' });
     return response.data.data.proposal;
   },
 };
@@ -310,26 +310,21 @@ export const contractApi = {
   },
 
   submitWork: async (id: string, workDescription: string) => {
-    const response = await api.post<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/submit-work`, {
+    const response = await api.patch<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/submit`, {
       workDescription,
     });
     return response.data.data.contract;
   },
 
   completeContract: async (id: string) => {
-    const response = await api.post<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/complete`);
+    const response = await api.patch<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/complete`);
     return response.data.data.contract;
   },
 
   raiseDispute: async (id: string, reason: string) => {
-    const response = await api.post<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/dispute`, {
+    const response = await api.patch<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/dispute`, {
       reason,
     });
-    return response.data.data.contract;
-  },
-
-  cancelContract: async (id: string) => {
-    const response = await api.post<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/cancel`);
     return response.data.data.contract;
   },
 };
