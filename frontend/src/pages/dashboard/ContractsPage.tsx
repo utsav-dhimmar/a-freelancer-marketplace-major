@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { contractApi, jobApi } from '../../api';
 import { Card, Button, TextArea } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,6 +7,7 @@ import type { IContract, IJob } from '../../types';
 
 export function ContractsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [contracts, setContracts] = useState<IContract[]>([]);
   const [jobs, setJobs] = useState<Record<string, IJob>>({});
   const [loading, setLoading] = useState(true);
@@ -31,7 +33,7 @@ export function ContractsPage() {
         try {
           const job = await jobApi.getById(jobId);
           jobData[jobId] = job;
-        } catch {}
+        } catch { }
       }
       setJobs(jobData);
     } catch (error) {
@@ -162,6 +164,15 @@ export function ContractsPage() {
                         onClick={() => setSelectedContract(contract)}
                       >
                         Submit Work
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline-primary"
+                        onClick={() =>
+                          navigate(`/dashboard/contracts/${contract._id}/chat`)
+                        }
+                      >
+                        💬 Chat
                       </Button>
                       {user?.role === 'client' && (
                         <Button

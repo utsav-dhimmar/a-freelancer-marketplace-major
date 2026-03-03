@@ -69,6 +69,21 @@ const ContractsPage = lazy(() =>
     default: module.ContractsPage,
   })),
 );
+const ChatPage = lazy(() =>
+  import('./pages/dashboard/ChatPage').then((module) => ({
+    default: module.ChatPage,
+  })),
+);
+const MyJobsPage = lazy(() =>
+  import('./pages/dashboard/MyJobsPage').then((module) => ({
+    default: module.MyJobsPage,
+  })),
+);
+const JobProposalsPage = lazy(() =>
+  import('./pages/dashboard/JobProposalsPage').then((module) => ({
+    default: module.JobProposalsPage,
+  })),
+);
 
 // ─── Admin Pages ──────────────────────────────────────────────────
 const AdminLoginPage = lazy(() =>
@@ -169,8 +184,24 @@ export const routes: RouteObject[] = [
       {
         path: '/dashboard/proposals',
         element: (
-          <ProtectedRoute allowedRoles={['freelancer']}>
+          <ProtectedRoute allowedRoles={['freelancer', 'client']}>
             <ProposalsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dashboard/jobs',
+        element: (
+          <ProtectedRoute allowedRoles={['client']}>
+            <MyJobsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dashboard/jobs/:id/proposals',
+        element: (
+          <ProtectedRoute allowedRoles={['client']}>
+            <JobProposalsPage />
           </ProtectedRoute>
         ),
       },
@@ -179,6 +210,14 @@ export const routes: RouteObject[] = [
         element: (
           <ProtectedRoute>
             <ContractsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dashboard/contracts/:id/chat',
+        element: (
+          <ProtectedRoute>
+            <ChatPage />
           </ProtectedRoute>
         ),
       },

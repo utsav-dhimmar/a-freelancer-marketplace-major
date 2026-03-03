@@ -283,12 +283,12 @@ export const proposalApi = {
   },
 
   accept: async (id: string) => {
-    const response = await api.post<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/accept`);
+    const response = await api.put<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/accept`);
     return response.data.data.proposal;
   },
 
   reject: async (id: string) => {
-    const response = await api.post<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/reject`);
+    const response = await api.put<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/reject`);
     return response.data.data.proposal;
   },
 };
@@ -331,6 +331,49 @@ export const contractApi = {
   cancelContract: async (id: string) => {
     const response = await api.post<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/cancel`);
     return response.data.data.contract;
+  },
+};
+
+export interface IChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface IChatInfo {
+  contractId: string;
+  totalMessages: number;
+  lastMessageAt: string | null;
+  lastMessage: string | null;
+  lastSenderName: string | null;
+}
+
+export const chatApi = {
+  sendMessage: async (contractId: string, message: string) => {
+    const response = await api.post<ApiResponse<{ message: IChatMessage }>>(
+      `/chat/${contractId}/messages`,
+      { message },
+    );
+    return response.data.data.message;
+  },
+
+  getMessages: async (contractId: string, page: number = 1, limit: number = 50) => {
+    const response = await api.get<ApiResponse<{
+      messages: IChatMessage[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }>>(`/chat/${contractId}/messages`, { params: { page, limit } });
+    return response.data.data;
+  },
+
+  getChatInfo: async (contractId: string) => {
+    const response = await api.get<ApiResponse<{ chatInfo: IChatInfo }>>(
+      `/chat/${contractId}/info`,
+    );
+    return response.data.data.chatInfo;
   },
 };
 
