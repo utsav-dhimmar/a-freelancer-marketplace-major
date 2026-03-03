@@ -41,12 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(adminUser);
       } else {
         // Use normal user /users/me endpoint
-        const response = await authApi.me();
-        // authApi.me() returns the full API response — extract user
-        const userData =
-          (response as unknown as { data?: { user?: IUser } })?.data?.user ??
-          response;
-        setUser(userData as IUser);
+        const userData = await authApi.me();
+        setUser(userData);
       }
     } catch {
       setUser(null);
@@ -68,12 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await authApi.login({ email, password });
-    // authApi.login() returns full API response — extract user
-    const userData =
-      (response as unknown as { data?: { user?: IUser } })?.data?.user ??
-      (response as unknown as { user?: IUser })?.user ??
-      response;
-    setUser(userData as IUser);
+    setUser(response.user);
   };
 
   const register = async (

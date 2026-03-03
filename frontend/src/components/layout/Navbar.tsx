@@ -26,7 +26,7 @@ export function Navbar() {
     handleCollapse();
   };
 
-  const initial = user?.name?.[0]?.toUpperCase() || 'U';
+  const initial = (user?.fullname || user?.username)?.[0]?.toUpperCase() || 'U';
   const MENU_LINKS = [
     {
       label: 'Job',
@@ -60,13 +60,40 @@ export function Navbar() {
             {MENU_LINKS.map(({ link, label }) => (
               <Link
                 to={link}
-                className="nav-link text-uppercase small px-3 text-center"
+                className="nav-link text-uppercase small px-3 text-center text-lg-start"
                 onClick={handleCollapse}
                 key={label}
               >
                 {label}
               </Link>
             ))}
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="nav-link text-uppercase small px-3 text-center text-lg-start d-none d-lg-block"
+                  onClick={handleCollapse}
+                >
+                  Dashboard
+                </Link>
+                {user?.role === 'freelancer' && (
+                  <Link
+                    to="/dashboard/proposals"
+                    className="nav-link text-uppercase small px-3 text-center text-lg-start d-none d-lg-block"
+                    onClick={handleCollapse}
+                  >
+                    Proposals
+                  </Link>
+                )}
+                <Link
+                  to="/dashboard/contracts"
+                  className="nav-link text-uppercase small px-3 text-center text-lg-start d-none d-lg-block"
+                  onClick={handleCollapse}
+                >
+                  Contracts
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 gap-lg-3 w-100 w-lg-auto">
@@ -95,7 +122,7 @@ export function Navbar() {
                       {initial}
                     </span>
                     <span className="d-none d-lg-inline">
-                      {user?.name?.split(' ')[0] || 'Profile'}
+                      {(user?.fullname || user?.username)?.split(' ')[0] || 'Profile'}
                     </span>
                   </button>
                   <ul
@@ -103,6 +130,15 @@ export function Navbar() {
                       dropdownOpen ? 'show' : ''
                     }`}
                   >
+                    <li>
+                      <Link
+                        to="/profile"
+                        className="dropdown-item"
+                        onClick={handleCollapse}
+                      >
+                        Profile Settings
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         to="/dashboard"

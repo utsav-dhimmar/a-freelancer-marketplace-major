@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   console.log(
     `[URL]: ${req.url} [METHOD]: ${req.method} [STATUS]: ${res.statusCode}`,
   );
-  console.log(req);
+  // console.log(req);
   next();
 });
 

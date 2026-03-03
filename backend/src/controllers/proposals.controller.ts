@@ -108,7 +108,7 @@ export const getFreelancerProposals = asyncHandler(
       page,
       limit,
     );
-    if (!result.proposals || result.proposals.length) {
+    if (!result.proposals || result.proposals.length === 0) {
       throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Proposals not found');
     }
     res

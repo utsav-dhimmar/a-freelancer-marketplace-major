@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react';
-import type { SyntheticEvent } from 'react';
-import { Link } from 'react-router-dom';
-import { jobApi } from '../../api';
-import { Button } from '../../components/ui';
-import type { IJob } from '../../types';
+import { useEffect, useState } from "react";
+import type { SyntheticEvent } from "react";
+import { Link } from "react-router-dom";
+import { jobApi } from "../../api";
+import { Button } from "../../components/ui";
+import type { IJob } from "../../types";
 
 const statusBadgeClasses: Record<string, string> = {
-  open: 'bg-primary',
-  in_progress: 'bg-secondary',
-  completed: 'bg-success',
-  cancelled: 'bg-danger',
+  open: "bg-primary",
+  in_progress: "bg-secondary",
+  completed: "bg-success",
+  cancelled: "bg-danger",
 };
 
 export function HomePage() {
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     void loadJobs();
@@ -24,10 +24,10 @@ export function HomePage() {
   const loadJobs = async () => {
     setLoading(true);
     try {
-      const data = await jobApi.getAll({ status: 'open' });
+      const data = await jobApi.getAll({ status: "open" });
       setJobs(data.jobs.slice(0, 6));
     } catch (error) {
-      console.error('Failed to load jobs:', error);
+      console.error("Failed to load jobs:", error);
     } finally {
       setLoading(false);
     }
@@ -37,10 +37,10 @@ export function HomePage() {
     event.preventDefault();
     setLoading(true);
     try {
-      const data = await jobApi.getAll({ search, status: 'open' });
+      const data = await jobApi.getAll({ search, status: "open" });
       setJobs(data.jobs.slice(0, 6));
     } catch (error) {
-      console.error('Search failed:', error);
+      console.error("Search failed:", error);
     } finally {
       setLoading(false);
     }
@@ -48,9 +48,9 @@ export function HomePage() {
 
   const renderStatusBadge = (status: string) => (
     <span
-      className={`badge ${statusBadgeClasses[status] ?? 'bg-secondary'} text-uppercase`}
+      className={`badge ${statusBadgeClasses[status] ?? "bg-secondary"} text-uppercase`}
     >
-      {status.replace('_', ' ')}
+      {status.replace("_", " ")}
     </span>
   );
 
@@ -63,7 +63,7 @@ export function HomePage() {
           </span>
           <h1 className="display-5 fw-bold mt-3 mb-3">
             Where exceptional <br />
-            <span className="text-white">talent</span> meets extraordinary{' '}
+            <span className="text-white">talent</span> meets extraordinary{" "}
             <span className="text-white-50">opportunities</span>
           </h1>
           <p className="lead text-white-50 mb-4">
@@ -163,11 +163,11 @@ export function HomePage() {
                         <div className="d-flex align-items-center justify-content-between mt-auto gap-3">
                           <div>
                             <p className="mb-0 fw-semibold text-primary">
-                              ${job.budgetAmount}
+                              ${job.budget}
                               <span className="small text-muted">
-                                {job.budgetType === 'hourly'
-                                  ? ' /hr'
-                                  : ' fixed'}
+                                {job.budgetType === "hourly"
+                                  ? " /hr"
+                                  : " fixed"}
                               </span>
                             </p>
                           </div>

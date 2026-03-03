@@ -102,12 +102,26 @@ const AdminReviewsPage = lazy(() =>
   })),
 );
 
+const ProfilePage = lazy(() =>
+  import('./pages/auth/ProfilePage').then((module) => ({
+    default: module.ProfilePage,
+  })),
+);
+
 export const routes: RouteObject[] = [
   // ─── User Routes (with Navbar + Footer) ─────────────────────
   {
     element: <UserLayout />,
     children: [
       { path: '/', element: <HomePage /> },
+      {
+        path: '/profile',
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/login',
         element: (
