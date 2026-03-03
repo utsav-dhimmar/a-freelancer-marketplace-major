@@ -9,9 +9,15 @@ const asyncHandler = (requestHandler: RequestHandler): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       await requestHandler(req, res, next);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof ApiError) {
         res.status(error.statusCode || 500).json({
+          success: false,
+          message: error.message,
+          errors: error.errors,
+        });
+      } else if (error.name === 'ValidationError') {
+        res.status(400).json({
           success: false,
           message: error.message,
           errors: error.errors,
