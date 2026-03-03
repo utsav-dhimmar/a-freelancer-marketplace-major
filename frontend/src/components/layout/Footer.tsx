@@ -47,11 +47,16 @@ export function Footer() {
 
           {footerColumns.map((column) => (
             <div className="col-6 col-md-2" key={column.title}>
-              <h6 className="text-uppercase small text-muted">{column.title}</h6>
+              <h6 className="text-uppercase small text-muted">
+                {column.title}
+              </h6>
               <ul className="list-unstyled">
                 {column.items.map((item) => (
                   <li key={item.label}>
-                    <Link className="text-decoration-none text-muted" to={item.to}>
+                    <Link
+                      className="text-decoration-none text-muted"
+                      to={item.to}
+                    >
                       {item.label}
                     </Link>
                   </li>

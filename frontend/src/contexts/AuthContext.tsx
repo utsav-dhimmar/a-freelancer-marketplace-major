@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { authApi } from '../api';
+import { adminApi } from '../api/admin';
 import type { IUser } from '../types';
 
 interface AuthContextType {
@@ -16,9 +17,17 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  setUser: (user: IUser | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+/**
+ * Checks if we are currently on an admin route.
+ */
+function isAdminRoute(): boolean {
+  return window.location.pathname.startsWith('/admin');
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
@@ -26,8 +35,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const userData = await authApi.me();
-      setUser(userData);
+      if (isAdminRoute()) {
+        // Use admin-specific /admin/me endpoint
+        const adminUser = await adminApi.getMe();
+        setUser(adminUser);
+      } else {
+        // Use normal user /users/me endpoint
+        const response = await authApi.me();
+        // authApi.me() returns the full API response — extract user
+        const userData =
+          (response as unknown as { data?: { user?: IUser } })?.data?.user ??
+          response;
+        setUser(userData as IUser);
+      }
     } catch {
       setUser(null);
       localStorage.removeItem('accessToken');
@@ -48,7 +68,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await authApi.login({ email, password });
-    setUser(response.user);
+    // authApi.login() returns full API response — extract user
+    const userData =
+      (response as unknown as { data?: { user?: IUser } })?.data?.user ??
+      (response as unknown as { user?: IUser })?.user ??
+      response;
+    setUser(userData as IUser);
   };
 
   const register = async (
@@ -62,7 +87,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await authApi.logout();
+      if (isAdminRoute()) {
+        // Use admin-specific /admin/logout endpoint
+        await adminApi.logout();
+      } else {
+        // Use normal user /users/logout endpoint
+        await authApi.logout();
+      }
     } finally {
       setUser(null);
     }
@@ -78,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         refreshUser,
+        setUser,
       }}
     >
       {children}

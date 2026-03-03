@@ -65,8 +65,16 @@ export function RegisterPage() {
               >
                 <div className="d-flex gap-2">
                   {[
-                    { value: 'client', label: 'Client', description: 'I want to hire talent' },
-                    { value: 'freelancer', label: 'Freelancer', description: 'I want to find work' },
+                    {
+                      value: 'client',
+                      label: 'Client',
+                      description: 'I want to hire talent',
+                    },
+                    {
+                      value: 'freelancer',
+                      label: 'Freelancer',
+                      description: 'I want to find work',
+                    },
                   ].map((option) => (
                     <label
                       key={option.value}
@@ -88,7 +96,9 @@ export function RegisterPage() {
                 </div>
 
                 {errors.role && (
-                  <p className="text-danger small mb-0">{errors.role.message}</p>
+                  <p className="text-danger small mb-0">
+                    {errors.role.message}
+                  </p>
                 )}
 
                 <Input

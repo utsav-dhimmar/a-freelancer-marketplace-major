@@ -209,7 +209,10 @@ export function JobDetailPage() {
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmitProposal} className="d-flex flex-column gap-3">
+                  <form
+                    onSubmit={handleSubmitProposal}
+                    className="d-flex flex-column gap-3"
+                  >
                     <TextArea
                       label="Cover Letter"
                       placeholder="Introduce yourself and explain why you're the best fit..."
@@ -258,7 +261,11 @@ export function JobDetailPage() {
                       </div>
                     </div>
                     <div className="d-flex gap-2">
-                      <Button type="submit" isLoading={submitting} className="flex-fill text-uppercase">
+                      <Button
+                        type="submit"
+                        isLoading={submitting}
+                        className="flex-fill text-uppercase"
+                      >
                         Submit Proposal
                       </Button>
                       <Button
@@ -282,7 +289,9 @@ export function JobDetailPage() {
                   <h5 className="mb-0">Your Proposal</h5>
                   <span
                     className={`badge ${
-                      proposal.status === 'accepted' ? 'bg-success' : 'bg-secondary'
+                      proposal.status === 'accepted'
+                        ? 'bg-success'
+                        : 'bg-secondary'
                     } text-uppercase`}
                   >
                     {proposal.status}
@@ -291,7 +300,9 @@ export function JobDetailPage() {
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item px-0 border-0 d-flex justify-content-between">
                     <span className="text-muted">Bid Amount</span>
-                    <span className="fw-semibold">${proposal.proposedAmount}</span>
+                    <span className="fw-semibold">
+                      ${proposal.proposedAmount}
+                    </span>
                   </li>
                   <li className="list-group-item px-0 border-0 d-flex justify-content-between">
                     <span className="text-muted">Duration</span>

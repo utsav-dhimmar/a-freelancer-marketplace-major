@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
-import type { SyntheticEvent } from "react";
-import { Link } from "react-router-dom";
-import { jobApi } from "../../api";
-import { Button } from "../../components/ui";
-import type { IJob, JobStatus } from "../../types";
+import { useEffect, useState } from 'react';
+import type { SyntheticEvent } from 'react';
+import { Link } from 'react-router-dom';
+import { jobApi } from '../../api';
+import { Button } from '../../components/ui';
+import type { IJob, JobStatus } from '../../types';
 
 const statusBadgeClasses: Record<string, string> = {
-  open: "bg-primary",
-  in_progress: "bg-secondary",
-  completed: "bg-success",
-  cancelled: "bg-danger",
+  open: 'bg-primary',
+  in_progress: 'bg-secondary',
+  completed: 'bg-success',
+  cancelled: 'bg-danger',
 };
 
 export function JobsListPage() {
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<JobStatus | "">("");
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<JobStatus | ''>('');
 
   useEffect(() => {
     void loadJobs();
@@ -31,7 +31,7 @@ export function JobsListPage() {
       const data = await jobApi.getAll(params);
       setJobs(data.jobs);
     } catch (error) {
-      console.error("Failed to load jobs:", error);
+      console.error('Failed to load jobs:', error);
     } finally {
       setLoading(false);
     }
@@ -44,9 +44,9 @@ export function JobsListPage() {
 
   const renderStatusBadge = (jobStatus: string) => (
     <span
-      className={`badge ${statusBadgeClasses[jobStatus] ?? "bg-secondary"} text-uppercase`}
+      className={`badge ${statusBadgeClasses[jobStatus] ?? 'bg-secondary'} text-uppercase`}
     >
-      {jobStatus.replace("_", " ")}
+      {jobStatus.replace('_', ' ')}
     </span>
   );
 
@@ -82,7 +82,7 @@ export function JobsListPage() {
                 className="form-select"
                 value={status}
                 onChange={(event) =>
-                  setStatus(event.target.value as JobStatus | "")
+                  setStatus(event.target.value as JobStatus | '')
                 }
               >
                 <option value="">All Statuses</option>
@@ -153,7 +153,7 @@ export function JobsListPage() {
                         <p className="mb-0 fw-semibold text-primary">
                           ${job.budgetAmount}
                           <span className="small text-muted">
-                            {job.budgetType === "hourly" ? " /hr" : " fixed"}
+                            {job.budgetType === 'hourly' ? ' /hr' : ' fixed'}
                           </span>
                         </p>
                       </div>

@@ -1,22 +1,17 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import type { UserRole } from '../../types';
 
-interface ProtectedRouteProps {
+interface AdminProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: UserRole[];
 }
 
 /**
- * Protects normal user routes.
- * - Unauthenticated users → /login
- * - Admin users → /admin (they should use admin pages)
- * - Users without the required role → /dashboard
+ * Protects admin-only routes.
+ * - Unauthenticated users → /admin/login
+ * - Non-admin users → /dashboard
+ * - Admin users → renders children
  */
-export function ProtectedRoute({
-  children,
-  allowedRoles,
-}: ProtectedRouteProps) {
+export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -34,15 +29,10 @@ export function ProtectedRoute({
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // Admin users should not access normal user protected pages
-  if (user && user.role === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  if (user?.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
   }
 

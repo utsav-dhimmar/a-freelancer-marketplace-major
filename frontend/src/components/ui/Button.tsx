@@ -1,42 +1,42 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?:
-    | "primary"
-    | "secondary"
-    | "outline"
-    | "outline-primary"
-    | "outline-secondary"
-    | "outline-danger"
-    | "ghost"
-    | "danger"
-    | "success";
-  size?: "sm" | "md" | "lg";
+    | 'primary'
+    | 'secondary'
+    | 'outline'
+    | 'outline-primary'
+    | 'outline-secondary'
+    | 'outline-danger'
+    | 'ghost'
+    | 'danger'
+    | 'success';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }
 
 export const Button = ({
-  variant = "primary",
-  size = "md",
+  variant = 'primary',
+  size = 'md',
   isLoading,
-  className = "",
+  className = '',
   children,
   disabled,
   ref,
   ...props
 }: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) => {
-  const variantMap: Record<ButtonProps["variant"], string> = {
-    primary: "btn-primary",
-    secondary: "btn-secondary",
-    outline: "btn-outline-secondary",
-    "outline-primary": "btn-outline-primary",
-    "outline-secondary": "btn-outline-secondary",
-    "outline-danger": "btn-outline-danger",
-    ghost: "btn-link text-secondary",
-    danger: "btn-danger",
-    success: "btn-success",
+  const variantMap: Record<ButtonProps['variant'], string> = {
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    outline: 'btn-outline-secondary',
+    'outline-primary': 'btn-outline-primary',
+    'outline-secondary': 'btn-outline-secondary',
+    'outline-danger': 'btn-outline-danger',
+    ghost: 'btn-link text-secondary',
+    danger: 'btn-danger',
+    success: 'btn-success',
   };
-  const sizeClass = size === "md" ? "" : `btn-${size}`;
+  const sizeClass = size === 'md' ? '' : `btn-${size}`;
   const variantClass = variantMap[variant] ?? variantMap.primary;
 
   return (
