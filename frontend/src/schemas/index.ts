@@ -19,6 +19,7 @@ export const jobSchema = z.object({
   skillsRequired: z.array(z.string()).min(1, 'At least one skill is required'),
   budgetType: z.enum(['fixed', 'hourly']),
   budgetAmount: z.number().min(1, 'Budget amount must be at least 1'),
+  difficulty: z.enum(['entry', 'intermediate', 'expert']),
   deadline: z.string().refine((date) => new Date(date) > new Date(), {
     message: 'Deadline must be in the future',
   }),

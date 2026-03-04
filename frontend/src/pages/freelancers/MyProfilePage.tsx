@@ -26,6 +26,7 @@ export function MyProfilePage() {
     link: '',
   });
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     loadFreelancer();
@@ -41,22 +42,33 @@ export function MyProfilePage() {
         skills: data.skills,
         hourlyRate: data.hourlyRate,
       });
-    } catch (error) {
-      console.error('Failed to load freelancer:', error);
+      setIsCreating(false);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        setIsCreating(true);
+        setEditing(true);
+      } else {
+        console.error('Failed to load freelancer:', error);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleUpdate = async () => {
-    if (!freelancer) return;
+    if (!freelancer && !isCreating) return;
     setSaving(true);
     try {
-      await freelancerApi.update(freelancer._id, formData);
+      if (isCreating) {
+        await freelancerApi.create(formData);
+      } else if (freelancer) {
+        await freelancerApi.update(freelancer._id, formData);
+      }
       setEditing(false);
+      setIsCreating(false);
       loadFreelancer();
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error('Failed to save profile:', error);
     } finally {
       setSaving(false);
     }
@@ -128,10 +140,10 @@ export function MyProfilePage() {
     );
   }
 
-  if (!freelancer) {
+  if (!freelancer && !isCreating) {
     return (
       <div className="container py-5 text-center">
-        <p>Please create your freelancer profile first.</p>
+        <p>There was an error loading your profile.</p>
         <Link to="/freelancers">Browse Freelancers</Link>
       </div>
     );
@@ -140,10 +152,12 @@ export function MyProfilePage() {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>My Profile</h2>
-        <Button variant="outline-primary" onClick={() => setEditing(!editing)}>
-          {editing ? 'Cancel' : 'Edit'}
-        </Button>
+        <h2>{isCreating ? 'Create Profile' : 'My Profile'}</h2>
+        {!isCreating && (
+          <Button variant="outline-primary" onClick={() => setEditing(!editing)}>
+            {editing ? 'Cancel' : 'Edit'}
+          </Button>
+        )}
       </div>
 
       <div className="row">
@@ -215,18 +229,20 @@ export function MyProfilePage() {
                 </Button>
               </>
             ) : (
-              <>
-                <h3>{freelancer.title}</h3>
-                <p className="text-muted">{freelancer.bio}</p>
-                <h5 className="mt-4">Skills</h5>
-                <div className="mb-4">
-                  {freelancer.skills.map((skill) => (
-                    <span key={skill} className="badge bg-primary me-1 mb-1">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </>
+              freelancer && (
+                <>
+                  <h3>{freelancer.title}</h3>
+                  <p className="text-muted">{freelancer.bio}</p>
+                  <h5 className="mt-4">Skills</h5>
+                  <div className="mb-4">
+                    {freelancer.skills.map((skill) => (
+                      <span key={skill} className="badge bg-primary me-1 mb-1">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )
             )}
           </Card>
 
@@ -290,7 +306,7 @@ export function MyProfilePage() {
             )}
 
             <div className="row">
-              {freelancer.portfolio?.map((item, index) => (
+              {freelancer?.portfolio?.map((item, index) => (
                 <div key={index} className="col-md-6 mb-3">
                   <div className="card">
                     <div className="card-body">
@@ -316,7 +332,7 @@ export function MyProfilePage() {
                   </div>
                 </div>
               ))}
-              {(!freelancer.portfolio || freelancer.portfolio.length === 0) &&
+              {(!freelancer?.portfolio || freelancer.portfolio.length === 0) &&
                 !showPortfolioForm && (
                   <p className="text-muted">No portfolio items yet.</p>
                 )}
@@ -369,11 +385,11 @@ export function MyProfilePage() {
           <Card className="mt-3" title="Stats">
             <div className="mb-3">
               <small className="text-muted">Hourly Rate</small>
-              <p className="mb-0 fw-bold fs-5">${freelancer.hourlyRate}/hr</p>
+              <p className="mb-0 fw-bold fs-5">${freelancer?.hourlyRate || formData.hourlyRate || 0}/hr</p>
             </div>
             <div className="mb-3">
               <small className="text-muted">Portfolio Items</small>
-              <p className="mb-0">{freelancer.portfolio?.length || 0}</p>
+              <p className="mb-0">{freelancer?.portfolio?.length || 0}</p>
             </div>
           </Card>
         </div>

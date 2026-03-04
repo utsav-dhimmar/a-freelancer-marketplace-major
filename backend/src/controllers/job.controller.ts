@@ -30,6 +30,7 @@ export const createJob = asyncHandler(
       budget,
       budgetType,
       skillsRequired,
+      deadline,
     } = req.body;
 
     // Validate required fields
@@ -72,6 +73,7 @@ export const createJob = asyncHandler(
       budget,
       budgetType,
       skillsRequired,
+      deadline,
     });
 
     res.status(HTTP_STATUS.CREATED).json(

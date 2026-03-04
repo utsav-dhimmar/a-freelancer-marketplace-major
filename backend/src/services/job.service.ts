@@ -11,6 +11,7 @@ export interface CreateJobData {
   budget: number;
   budgetType: 'fixed' | 'hourly';
   skillsRequired?: string[];
+  deadline?: Date;
 }
 
 /**
@@ -23,6 +24,7 @@ export interface UpdateJobData {
   budget?: number;
   budgetType?: 'fixed' | 'hourly';
   skillsRequired?: string[];
+  deadline?: Date;
 }
 
 /**

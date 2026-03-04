@@ -9,21 +9,30 @@ import { jobSchema, type JobInput } from '../../schemas';
 export function CreateJobPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<JobInput>({
     resolver: zodResolver(jobSchema),
+    defaultValues: {
+      skillsRequired: [],
+    },
   });
+
+  const skills = watch('skillsRequired') || [];
 
   const onSubmit = async (data: JobInput) => {
     try {
       setError(null);
-      await jobApi.create({ ...data, skillsRequired: skills });
+      await jobApi.create({
+        ...data,
+        budget: data.budgetAmount,
+      });
       navigate('/jobs');
     } catch (err) {
       setError('Failed to create job. Please try again.');
@@ -32,13 +41,19 @@ export function CreateJobPage() {
 
   const addSkill = () => {
     if (skillInput.trim() && !skills.includes(skillInput.trim())) {
-      setSkills([...skills, skillInput.trim()]);
+      setValue('skillsRequired', [...skills, skillInput.trim()], {
+        shouldValidate: true,
+      });
       setSkillInput('');
     }
   };
 
   const removeSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill));
+    setValue(
+      'skillsRequired',
+      skills.filter((s) => s !== skill),
+      { shouldValidate: true },
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -58,7 +73,7 @@ export function CreateJobPage() {
         <div className="col-lg-8">
           <Card title="Post a New Job">
             {error && <div className="alert alert-danger">{error}</div>}
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}>
               <Input
                 label="Job Title"
                 {...register('title')}
@@ -97,6 +112,11 @@ export function CreateJobPage() {
                   >
                     Add
                   </Button>
+                  {errors.skillsRequired && (
+                    <div className="invalid-feedback">
+                      {errors.skillsRequired.message}
+                    </div>
+                  )}
                 </div>
                 <div>
                   {skills.map((skill) => (
@@ -114,7 +134,19 @@ export function CreateJobPage() {
               </div>
 
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-4">
+                  <Select
+                    label="Difficulty"
+                    {...register('difficulty')}
+                    options={[
+                      { value: 'entry', label: 'Entry Level' },
+                      { value: 'intermediate', label: 'Intermediate' },
+                      { value: 'expert', label: 'Expert' },
+                    ]}
+                    error={errors.difficulty?.message}
+                  />
+                </div>
+                <div className="col-md-4">
                   <Select
                     label="Budget Type"
                     {...register('budgetType')}
@@ -122,9 +154,10 @@ export function CreateJobPage() {
                       { value: 'fixed', label: 'Fixed Price' },
                       { value: 'hourly', label: 'Hourly Rate' },
                     ]}
+                    error={errors.budgetType?.message}
                   />
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-4">
                   <Input
                     label="Budget Amount ($)"
                     type="number"
