@@ -25,18 +25,18 @@ export class ApiResponse<T> {
   message: string;
   success: boolean;
   data: T;
-  stack?: string;
+
 
   constructor(
     statusCode: number,
     message: string,
     data: T,
-    stack: string = '',
+
   ) {
     this.statusCode = statusCode;
     this.message = message;
     this.success = true;
     this.data = data;
-    this.stack = stack;
+
   }
 }
