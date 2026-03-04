@@ -1,6 +1,15 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import { beforeAll, afterAll, afterEach } from 'vitest';
+import { beforeAll, afterAll, afterEach, vi } from 'vitest';
+
+// Mock EmailService globally
+vi.mock('../services/email.service.js', () => ({
+    emailService: {
+        sendWelcomeEmail: vi.fn().mockResolvedValue(true),
+        sendProposalAcceptedEmail: vi.fn().mockResolvedValue(true),
+        sendNewProposalEmail: vi.fn().mockResolvedValue(true),
+    },
+}));
 
 let mongoServer: MongoMemoryServer;
 

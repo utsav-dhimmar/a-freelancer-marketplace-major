@@ -9,8 +9,8 @@ describe('App APIs', () => {
         expect(res.body.message).toBe('Welcome to the Freelancer Marketplace API');
     });
 
-    it('should return 400 for unknown route', async () => {
+    it('should return 404 for unknown route', async () => {
         const res = await request(app).get('/api/unknown');
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(404);
     });
 });

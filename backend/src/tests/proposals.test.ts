@@ -47,11 +47,7 @@ describe('Proposal APIs', () => {
 
       expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
-      // Proposal job might be populated
-      const responseJobId = typeof res.body.data.proposal.job === 'object'
-        ? res.body.data.proposal.job._id
-        : res.body.data.proposal.job;
-      expect(responseJobId).toBe(jobId);
+      expect(res.body.data.proposal.job).toBe(jobId);
     });
   });
 
