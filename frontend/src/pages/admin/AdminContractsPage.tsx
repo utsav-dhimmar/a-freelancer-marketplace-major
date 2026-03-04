@@ -1,22 +1,32 @@
-import { useEffect, useState, useCallback } from 'react';
-import { AdminLayout } from './components/AdminLayout';
-import { adminApi } from '../../api/admin';
-import type { IAdminContract, AdminContractFilters } from '../../types/admin';
+import { useEffect, useState, useCallback } from "react";
+import { AdminLayout } from "./components/AdminLayout";
+import { adminApi } from "../../api/admin";
+import type { IAdminContract, AdminContractFilters } from "../../types/admin";
 
 const CONTRACT_STATUSES = [
-  'active',
-  'submitted',
-  'completed',
-  'disputed',
+  "active",
+  "submitted",
+  "completed",
+  "disputed",
 ] as const;
 
 interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error';
+  type: "success" | "error";
 }
 
 let toastId = 0;
+
+const TABLE_HEADINGS = [
+  "Job",
+  "Client",
+  "Freelancer",
+  "Amont",
+  "Status",
+  "Started",
+  "Actions",
+];
 
 export function AdminContractsPage() {
   const [contracts, setContracts] = useState<IAdminContract[]>([]);
@@ -28,7 +38,7 @@ export function AdminContractsPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = (message: string, type: 'success' | 'error') => {
+  const showToast = (message: string, type: "success" | "error") => {
     const id = ++toastId;
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(
@@ -49,8 +59,8 @@ export function AdminContractsPage() {
       setTotal(data.total);
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to load contracts',
-        'error',
+        err instanceof Error ? err.message : "Failed to load contracts",
+        "error",
       );
     } finally {
       setLoading(false);
@@ -68,12 +78,12 @@ export function AdminContractsPage() {
     setUpdatingId(id);
     try {
       await adminApi.updateContractStatus(id, newStatus);
-      showToast('Contract status updated successfully', 'success');
+      showToast("Contract status updated successfully", "success");
       fetchContracts();
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to update contract status',
-        'error',
+        err instanceof Error ? err.message : "Failed to update contract status",
+        "error",
       );
     } finally {
       setUpdatingId(null);
@@ -81,10 +91,10 @@ export function AdminContractsPage() {
   };
 
   const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    new Date(d).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
 
   return (
@@ -94,7 +104,7 @@ export function AdminContractsPage() {
         <div className="admin-toast-container">
           {toasts.map((t) => (
             <div key={t.id} className={`admin-toast ${t.type}`}>
-              {t.type === 'success' ? '✅' : '❌'} {t.message}
+              {t.type === "success" ? "✅" : "❌"} {t.message}
             </div>
           ))}
         </div>
@@ -105,12 +115,12 @@ export function AdminContractsPage() {
           <h2>All Contracts ({total})</h2>
           <div className="admin-table-filters">
             <select
-              value={filters.status || ''}
+              value={filters.status || ""}
               onChange={(e) => {
                 setPage(1);
                 setFilters({
                   status: (e.target.value ||
-                    undefined) as AdminContractFilters['status'],
+                    undefined) as AdminContractFilters["status"],
                 });
               }}
             >
@@ -136,28 +146,24 @@ export function AdminContractsPage() {
           </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: "auto" }}>
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>Job</th>
-                    <th>Client</th>
-                    <th>Freelancer</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Started</th>
-                    <th>Actions</th>
+                    {TABLE_HEADINGS.map((heading) => (
+                      <th key={heading}>{heading}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {contracts.map((c) => (
                     <tr key={c._id}>
                       <td>
-                        <strong>{c.job?.title || '—'}</strong>
+                        <strong>{c.job?.title || "—"}</strong>
                       </td>
-                      <td>{c.client?.username || '—'}</td>
-                      <td>{c.freelancer?.username || '—'}</td>
-                      <td>${c.amount?.toLocaleString() || '0'}</td>
+                      <td>{c.client?.username || "—"}</td>
+                      <td>{c.freelancer?.username || "—"}</td>
+                      <td>${c.amount?.toLocaleString() || "0"}</td>
                       <td>
                         <span className={`admin-badge ${c.status}`}>
                           {c.status}
@@ -176,11 +182,11 @@ export function AdminContractsPage() {
                             )
                           }
                           style={{
-                            fontSize: '0.8rem',
-                            padding: '0.3rem 0.5rem',
-                            borderRadius: '6px',
-                            border: '1px solid #e2e8f0',
-                            cursor: 'pointer',
+                            fontSize: "0.8rem",
+                            padding: "0.3rem 0.5rem",
+                            borderRadius: "6px",
+                            border: "1px solid #e2e8f0",
+                            cursor: "pointer",
                           }}
                         >
                           {CONTRACT_STATUSES.map((s) => (

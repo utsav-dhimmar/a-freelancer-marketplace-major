@@ -1,12 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
-import { AdminLayout } from './components/AdminLayout';
-import { adminApi } from '../../api/admin';
-import type { IAdminJob, AdminJobFilters } from '../../types/admin';
+import { useEffect, useState, useCallback } from "react";
+import { AdminLayout } from "./components/AdminLayout";
+import { adminApi } from "../../api/admin";
+import type { IAdminJob, AdminJobFilters } from "../../types/admin";
 
 interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error';
+  type: "success" | "error";
 }
 
 let toastId = 0;
@@ -20,7 +20,7 @@ export function AdminJobsPage() {
   const [filters, setFilters] = useState<AdminJobFilters>({});
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = (message: string, type: 'success' | 'error') => {
+  const showToast = (message: string, type: "success" | "error") => {
     const id = ++toastId;
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(
@@ -42,8 +42,8 @@ export function AdminJobsPage() {
       setTotal(data.total);
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to load jobs',
-        'error',
+        err instanceof Error ? err.message : "Failed to load jobs",
+        "error",
       );
     } finally {
       setLoading(false);
@@ -55,29 +55,29 @@ export function AdminJobsPage() {
   }, [fetchJobs]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this job and all its proposals?')) return;
+    if (!window.confirm("Delete this job and all its proposals?")) return;
     try {
       await adminApi.deleteJob(id);
-      showToast('Job deleted successfully', 'success');
+      showToast("Job deleted successfully", "success");
       fetchJobs();
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to delete job',
-        'error',
+        err instanceof Error ? err.message : "Failed to delete job",
+        "error",
       );
     }
   };
 
   const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    new Date(d).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
 
   const formatBudget = (job: IAdminJob) => {
-    const amt = job.budgetAmount?.toLocaleString() ?? '—';
-    return `$${amt} (${job.budgetType || 'fixed'})`;
+    const amt = job.budget?.toLocaleString() ?? "—";
+    return `$${amt} (${job.budgetType || "fixed"})`;
   };
 
   return (
@@ -87,7 +87,7 @@ export function AdminJobsPage() {
         <div className="admin-toast-container">
           {toasts.map((t) => (
             <div key={t.id} className={`admin-toast ${t.type}`}>
-              {t.type === 'success' ? '✅' : '❌'} {t.message}
+              {t.type === "success" ? "✅" : "❌"} {t.message}
             </div>
           ))}
         </div>
@@ -100,20 +100,20 @@ export function AdminJobsPage() {
             <input
               type="text"
               placeholder="Search jobs..."
-              value={filters.search || ''}
+              value={filters.search || ""}
               onChange={(e) => {
                 setPage(1);
                 setFilters({ ...filters, search: e.target.value || undefined });
               }}
             />
             <select
-              value={filters.status || ''}
+              value={filters.status || ""}
               onChange={(e) => {
                 setPage(1);
                 setFilters({
                   ...filters,
                   status: (e.target.value ||
-                    undefined) as AdminJobFilters['status'],
+                    undefined) as AdminJobFilters["status"],
                 });
               }}
             >
@@ -138,7 +138,7 @@ export function AdminJobsPage() {
           </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: "auto" }}>
               <table className="admin-table">
                 <thead>
                   <tr>
@@ -156,16 +156,16 @@ export function AdminJobsPage() {
                       <td>
                         <strong>{job.title}</strong>
                         <br />
-                        <small style={{ color: '#94a3b8' }}>
-                          {job.skillsRequired?.slice(0, 3).join(', ')}
-                          {job.skillsRequired?.length > 3 && '...'}
+                        <small style={{ color: "#94a3b8" }}>
+                          {job.skillsRequired?.slice(0, 3).join(", ")}
+                          {job.skillsRequired?.length > 3 && "..."}
                         </small>
                       </td>
-                      <td>{job.client?.username || '—'}</td>
+                      <td>{job.client?.username || "—"}</td>
                       <td>{formatBudget(job)}</td>
                       <td>
                         <span className={`admin-badge ${job.status}`}>
-                          {job.status?.replace('_', ' ')}
+                          {job.status?.replace("_", " ")}
                         </span>
                       </td>
                       <td>{formatDate(job.createdAt)}</td>

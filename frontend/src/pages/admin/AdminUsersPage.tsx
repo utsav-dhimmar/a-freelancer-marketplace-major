@@ -1,15 +1,17 @@
-import { useEffect, useState, useCallback } from 'react';
-import { AdminLayout } from './components/AdminLayout';
-import { adminApi } from '../../api/admin';
-import type { IUser } from '../../types';
+import { useEffect, useState, useCallback } from "react";
+import { AdminLayout } from "./components/AdminLayout";
+import { adminApi } from "../../api/admin";
+import type { IUser } from "../../types";
 
 interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error';
+  type: "success" | "error";
 }
 
 let toastId = 0;
+
+const TABLE_HEADINGS = ["User", "Email", "Role", "Joined", "Actions"];
 
 export function AdminUsersPage() {
   const [users, setUsers] = useState<IUser[]>([]);
@@ -22,10 +24,10 @@ export function AdminUsersPage() {
   // Edit modal
   const [editUser, setEditUser] = useState<IUser | null>(null);
   const [editForm, setEditForm] = useState({
-    username: '',
-    fullname: '',
-    email: '',
-    role: '',
+    username: "",
+    fullname: "",
+    email: "",
+    role: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -33,7 +35,7 @@ export function AdminUsersPage() {
   const [viewUser, setViewUser] = useState<IUser | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
 
-  const showToast = (message: string, type: 'success' | 'error') => {
+  const showToast = (message: string, type: "success" | "error") => {
     const id = ++toastId;
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(
@@ -51,8 +53,8 @@ export function AdminUsersPage() {
       setTotal(data.total);
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to load users',
-        'error',
+        err instanceof Error ? err.message : "Failed to load users",
+        "error",
       );
     } finally {
       setLoading(false);
@@ -70,8 +72,8 @@ export function AdminUsersPage() {
       setViewUser(user);
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to load user details',
-        'error',
+        err instanceof Error ? err.message : "Failed to load user details",
+        "error",
       );
     } finally {
       setViewLoading(false);
@@ -81,11 +83,11 @@ export function AdminUsersPage() {
   const openEdit = (user: IUser) => {
     setEditUser(user);
     setEditForm({
-      username: user.username || '',
+      username: user.username || "",
       fullname:
-        (user as unknown as { fullname?: string }).fullname || user.name || '',
-      email: user.email || '',
-      role: user.role || '',
+        (user as unknown as { fullname?: string }).fullname || user.name || "",
+      email: user.email || "",
+      role: user.role || "",
     });
   };
 
@@ -95,12 +97,12 @@ export function AdminUsersPage() {
     try {
       await adminApi.updateUser(editUser._id, editForm);
       setEditUser(null);
-      showToast('User updated successfully', 'success');
+      showToast("User updated successfully", "success");
       fetchUsers();
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to update user',
-        'error',
+        err instanceof Error ? err.message : "Failed to update user",
+        "error",
       );
     } finally {
       setSaving(false);
@@ -108,24 +110,24 @@ export function AdminUsersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       await adminApi.deleteUser(id);
-      showToast('User deleted successfully', 'success');
+      showToast("User deleted successfully", "success");
       fetchUsers();
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : 'Failed to delete user',
-        'error',
+        err instanceof Error ? err.message : "Failed to delete user",
+        "error",
       );
     }
   };
 
   const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    new Date(d).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
 
   return (
@@ -135,7 +137,7 @@ export function AdminUsersPage() {
         <div className="admin-toast-container">
           {toasts.map((t) => (
             <div key={t.id} className={`admin-toast ${t.type}`}>
-              {t.type === 'success' ? '✅' : '❌'} {t.message}
+              {t.type === "success" ? "✅" : "❌"} {t.message}
             </div>
           ))}
         </div>
@@ -158,15 +160,13 @@ export function AdminUsersPage() {
           </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: "auto" }}>
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
+                    {TABLE_HEADINGS.map((heading) => (
+                      <th key={heading}>{heading}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -175,11 +175,11 @@ export function AdminUsersPage() {
                       <td>
                         <strong>{user.username}</strong>
                         <br />
-                        <small style={{ color: '#94a3b8' }}>
+                        <small style={{ color: "#94a3b8" }}>
                           {(user as unknown as { fullname?: string })
                             .fullname ||
                             user.name ||
-                            '—'}
+                            "—"}
                         </small>
                       </td>
                       <td>{user.email}</td>
@@ -190,27 +190,27 @@ export function AdminUsersPage() {
                       </td>
                       <td>{formatDate(user.createdAt)}</td>
                       <td>
-                        <div style={{ display: 'flex', gap: '0.35rem' }}>
+                        <div style={{ display: "flex", gap: "0.35rem" }}>
                           <button
                             type="button"
                             className="admin-action-btn view"
                             onClick={() => handleView(user._id)}
                           >
-                            👁️ View
+                            View
                           </button>
                           <button
                             type="button"
                             className="admin-action-btn edit"
                             onClick={() => openEdit(user)}
                           >
-                            ✏️ Edit
+                            Edit
                           </button>
                           <button
                             type="button"
                             className="admin-action-btn delete"
                             onClick={() => handleDelete(user._id)}
                           >
-                            🗑️ Delete
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -267,7 +267,7 @@ export function AdminUsersPage() {
             </div>
             <div className="admin-modal-body">
               {viewLoading ? (
-                <div className="admin-loading" style={{ padding: '2rem 0' }}>
+                <div className="admin-loading" style={{ padding: "2rem 0" }}>
                   <div className="admin-spinner" />
                   <span>Loading user details...</span>
                 </div>
@@ -275,13 +275,13 @@ export function AdminUsersPage() {
                 viewUser && (
                   <>
                     <div className="admin-detail-avatar">
-                      {(viewUser.username || 'U').charAt(0).toUpperCase()}
+                      {(viewUser.username || "U").charAt(0).toUpperCase()}
                     </div>
                     <div className="admin-detail-grid">
                       <div className="admin-detail-item">
                         <div className="detail-label">Username</div>
                         <div className="detail-value">
-                          {viewUser.username || '—'}
+                          {viewUser.username || "—"}
                         </div>
                       </div>
                       <div className="admin-detail-item">
@@ -290,13 +290,13 @@ export function AdminUsersPage() {
                           {(viewUser as unknown as { fullname?: string })
                             .fullname ||
                             viewUser.name ||
-                            '—'}
+                            "—"}
                         </div>
                       </div>
                       <div className="admin-detail-item">
                         <div className="detail-label">Email</div>
                         <div className="detail-value">
-                          {viewUser.email || '—'}
+                          {viewUser.email || "—"}
                         </div>
                       </div>
                       <div className="admin-detail-item">
@@ -317,7 +317,7 @@ export function AdminUsersPage() {
                         <div className="detail-label">User ID</div>
                         <div
                           className="detail-value"
-                          style={{ fontSize: '0.75rem', color: '#64748b' }}
+                          style={{ fontSize: "0.75rem", color: "#64748b" }}
                         >
                           {viewUser._id}
                         </div>
@@ -411,7 +411,7 @@ export function AdminUsersPage() {
                 disabled={saving}
                 onClick={handleSave}
               >
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

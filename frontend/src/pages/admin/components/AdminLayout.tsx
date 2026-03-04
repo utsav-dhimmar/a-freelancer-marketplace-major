@@ -19,34 +19,34 @@ export function AdminLayout({ title, children }: AdminLayoutProps) {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="admin-content">
-        <header className="admin-topbar">
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
-          >
-            <button
-              type="button"
-              className="d-lg-none"
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '1.4rem',
-                cursor: 'pointer',
-                padding: 0,
-              }}
-              onClick={() => setSidebarOpen(true)}
-            >
-              ☰
-            </button>
-            <h1>{title}</h1>
-          </div>
-          <div className="admin-user-badge">
-            <div className="badge-avatar">A</div>
-            <span>{user?.email || 'Admin'}</span>
+      <div className="admin-content bg-light">
+        <header className="admin-topbar navbar bg-white border-bottom px-4 sticky-top">
+          <div className="container-fluid d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center gap-3">
+              <button
+                type="button"
+                className="btn btn-link p-0 d-lg-none text-dark"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <span style={{ fontSize: '1.5rem' }}>☰</span>
+              </button>
+              <h1 className="h5 fw-bold mb-0 text-dark">{title}</h1>
+            </div>
+            
+            <div className="d-flex align-items-center gap-2">
+              <div className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style={{ width: '32px', height: '32px', fontSize: '0.8rem' }}>
+                A
+              </div>
+              <span className="small text-muted d-none d-sm-inline">
+                {user?.email || 'Admin'}
+              </span>
+            </div>
           </div>
         </header>
 
-        <div className="admin-page-body">{children}</div>
+        <main className="admin-page-body container-fluid py-4 px-4">
+          {children}
+        </main>
       </div>
     </div>
   );

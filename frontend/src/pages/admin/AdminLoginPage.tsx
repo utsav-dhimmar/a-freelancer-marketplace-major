@@ -18,8 +18,6 @@ export function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // adminApi.login() returns { user, accessToken, refreshToken }
-      // Set the user directly — no need to call /users/me
       const data = await adminApi.login(email, password);
       setUser(data.user);
       navigate('/admin');
@@ -35,49 +33,75 @@ export function AdminLoginPage() {
   };
 
   return (
-    <div className="admin-login-wrapper">
-      <div className="admin-login-card">
-        <div className="login-brand">
-          <h2>Admin Panel</h2>
-          <p>Sign in to manage FreelanceHub</p>
+    <div
+      className="admin-login-wrapper d-flex align-items-center justify-content-center"
+      style={{ minHeight: '100vh', background: '#f8f9fa' }}
+    >
+      <div className="card shadow-sm border-0" style={{ maxWidth: '400px', width: '100%' }}>
+        <div className="card-body p-4">
+          <div className="text-center mb-4">
+            <h2 className="fw-bold">Admin Panel</h2>
+            <p className="text-muted small">Sign in to manage FreelanceHub</p>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger py-2 px-3 small mb-3" role="alert">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="admin-email" className="form-label small fw-semibold">
+                Email Address
+              </label>
+              <input
+                id="admin-email"
+                type="email"
+                className="form-control"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="admin-password" className="form-label small fw-semibold">
+                Password
+              </label>
+              <input
+                id="admin-password"
+                type="password"
+                className="form-control"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary w-100 py-2 fw-bold"
+              disabled={loading || !email || !password}
+            >
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
         </div>
-
-        {error && <div className="login-error">{error}</div>}
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="admin-email">Email Address</label>
-            <input
-              id="admin-email"
-              type="email"
-              placeholder="admin@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="admin-password">Password</label>
-            <input
-              id="admin-password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="login-submit"
-            disabled={loading || !email || !password}
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
       </div>
     </div>
   );
