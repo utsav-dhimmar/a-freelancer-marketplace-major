@@ -143,7 +143,7 @@ export function RegisterPage() {
                   error={errors.password?.message}
                 />
 
-                <div className="mb-2">
+<div className="mb-2">
                   <label className="form-label fw-medium text-dark small mb-1">
                     Profile Picture <span className="text-muted fw-normal">(Optional)</span>
                   </label>
@@ -155,8 +155,29 @@ export function RegisterPage() {
                   />
                 </div>
 
-                <Button
+                <div className="form-check">
+                  <input
+                    {...register('agreedToTerms')}
+                    type="checkbox"
+                    className="form-check-input"
+                    id="agreedToTerms"
+                  />
+                  <label className="form-check-label text-muted small" htmlFor="agreedToTerms">
+                    I agree to the{' '}
+                    <Link to="/terms" className="text-primary" target="_blank">
+                      Terms and Conditions
+                    </Link>
+                  </label>
+                </div>
+                {errors.agreedToTerms && (
+                  <p className="text-danger small mb-0">
+                    {errors.agreedToTerms.message}
+                  </p>
+                )}
+
+<Button
                   type="submit"
+                  variant="primary"
                   isLoading={isSubmitting}
                   className="text-uppercase"
                 >

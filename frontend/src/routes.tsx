@@ -123,6 +123,12 @@ const ProfilePage = lazy(() =>
   })),
 );
 
+const TermsPage = lazy(() =>
+  import('./pages/terms').then((module) => ({
+    default: module.default,
+  })),
+);
+
 export const routes: RouteObject[] = [
   // ─── User Routes (with Navbar + Footer) ─────────────────────
   {
@@ -165,6 +171,7 @@ export const routes: RouteObject[] = [
       },
       { path: '/freelancers', element: <FreelancersListPage /> },
       { path: '/freelancers/:id', element: <FreelancerProfilePage /> },
+      { path: '/terms', element: <TermsPage /> },
       {
         path: '/freelancers/me',
         element: (

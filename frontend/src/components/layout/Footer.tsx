@@ -17,12 +17,13 @@ const footerColumns = [
       { label: 'Press', to: '/press' },
     ],
   },
-  {
+{
     title: 'Support',
     items: [
       { label: 'Help Center', to: '/help' },
       { label: 'Contact', to: '/contact' },
       { label: 'Terms', to: '/terms' },
+      { label: 'Privacy Policy', to: '/privacy' },
     ],
   },
 ];
