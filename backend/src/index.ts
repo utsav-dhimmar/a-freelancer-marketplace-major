@@ -1,5 +1,7 @@
 import app from './app.js';
 import { connectDB } from './db/index.js';
+import { createServer } from 'http';
+import { initializeSocketServer } from './socket/index.js';
 
 const PORT = process.env.PORT || 8000;
 
@@ -8,7 +10,10 @@ const startServer = async () => {
     // Connect to MongoDB
     await connectDB();
 
-    app.listen(PORT, () => {
+    const server = createServer(app);
+    initializeSocketServer(server);
+
+    server.listen(PORT, () => {
       console.log(`[SERVER] running on http://localhost:${PORT}`);
     });
   } catch (error) {
