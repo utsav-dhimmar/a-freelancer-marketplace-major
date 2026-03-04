@@ -1,14 +1,14 @@
-export * from "./Api";
+export * from './Api';
 
-export type UserRole = "client" | "admin" | "freelancer";
+export type UserRole = 'client' | 'admin' | 'freelancer';
 
-export type JobStatus = "open" | "in_progress" | "completed" | "cancelled";
+export type JobStatus = 'open' | 'in_progress' | 'completed' | 'cancelled';
 
-export type ProposalStatus = "pending" | "accepted" | "rejected" | "withdrawn";
+export type ProposalStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn';
 
-export type ContractStatus = "active" | "completed" | "disputed" | "cancelled";
+export type ContractStatus = 'active' | 'completed' | 'disputed' | 'cancelled';
 
-export type BudgetType = "fixed" | "hourly";
+export type BudgetType = 'fixed' | 'hourly';
 
 export interface IUser {
   _id?: string;

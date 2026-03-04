@@ -27,14 +27,16 @@ export function ContractsPage() {
       const data = await contractApi.getMyContracts();
       setContracts(data);
 
-      const jobIds = Array.from(new Set<string>(data.map((c: IContract) => String(c.jobId))));
+      const jobIds = Array.from(
+        new Set<string>(data.map((c: IContract) => String(c.jobId))),
+      );
       const jobData: Record<string, IJob> = {};
       for (const jobId of jobIds) {
         if (!jobId) continue;
         try {
           const job = await jobApi.getById(jobId);
           jobData[jobId] = job;
-        } catch { }
+        } catch {}
       }
       setJobs(jobData);
     } catch (error) {

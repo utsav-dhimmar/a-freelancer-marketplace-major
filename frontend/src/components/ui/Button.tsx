@@ -2,15 +2,15 @@ import type { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant:
-  | 'primary'
-  | 'secondary'
-  | 'outline'
-  | 'outline-primary'
-  | 'outline-secondary'
-  | 'outline-danger'
-  | 'ghost'
-  | 'danger'
-  | 'success';
+    | 'primary'
+    | 'secondary'
+    | 'outline'
+    | 'outline-primary'
+    | 'outline-secondary'
+    | 'outline-danger'
+    | 'ghost'
+    | 'danger'
+    | 'success';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }

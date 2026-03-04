@@ -1,9 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUS } from '../constants/index.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
-import { jobService, type JobSearchFilters } from '../services/job.service.js';
+import { jobService } from '../services/job.service.js';
 import { ApiError, ApiResponse } from '../utils/ApiHelper.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import type { JobSearchFilters } from '../types/job.types.js';
 
 /**
  * POST /api/jobs

@@ -1,16 +1,5 @@
 import { User, type IUser } from '../model/user.model.js';
-
-/**
- * User registration data
- */
-export interface CreateUserData {
-  username: string;
-  fullname: string;
-  email: string;
-  password: string;
-  role?: 'client' | 'admin' | 'freelancer';
-  profilePicture?: string;
-}
+import type { CreateUserData } from '../types/user.types.js';
 
 export class UserService {
   /**

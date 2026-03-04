@@ -154,7 +154,10 @@ export function MyProfilePage() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>{isCreating ? 'Create Profile' : 'My Profile'}</h2>
         {!isCreating && (
-          <Button variant="outline-primary" onClick={() => setEditing(!editing)}>
+          <Button
+            variant="outline-primary"
+            onClick={() => setEditing(!editing)}
+          >
             {editing ? 'Cancel' : 'Edit'}
           </Button>
         )}
@@ -385,7 +388,9 @@ export function MyProfilePage() {
           <Card className="mt-3" title="Stats">
             <div className="mb-3">
               <small className="text-muted">Hourly Rate</small>
-              <p className="mb-0 fw-bold fs-5">${freelancer?.hourlyRate || formData.hourlyRate || 0}/hr</p>
+              <p className="mb-0 fw-bold fs-5">
+                ${freelancer?.hourlyRate || formData.hourlyRate || 0}/hr
+              </p>
             </div>
             <div className="mb-3">
               <small className="text-muted">Portfolio Items</small>

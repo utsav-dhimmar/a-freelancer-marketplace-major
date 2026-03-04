@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
-    sendMessage,
-    getMessages,
-    getChatInfo,
+  sendMessage,
+  getMessages,
+  getChatInfo,
 } from '../controllers/chat.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 

@@ -1,15 +1,15 @@
-import { type SyntheticEvent, useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { jobApi, proposalApi } from "../../api";
-import { Button, Input, TextArea } from "../../components/ui";
-import { useAuth } from "../../contexts/AuthContext";
-import type { IJob, IProposal } from "../../types";
+import { type SyntheticEvent, useEffect, useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { jobApi, proposalApi } from '../../api';
+import { Button, Input, TextArea } from '../../components/ui';
+import { useAuth } from '../../contexts/AuthContext';
+import type { IJob, IProposal } from '../../types';
 
 const statusBadgeClasses: Record<string, string> = {
-  open: "bg-primary",
-  in_progress: "bg-secondary",
-  completed: "bg-success",
-  cancelled: "bg-danger",
+  open: 'bg-primary',
+  in_progress: 'bg-secondary',
+  completed: 'bg-success',
+  cancelled: 'bg-danger',
 };
 
 export function JobDetailPage() {
@@ -21,7 +21,7 @@ export function JobDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showProposalForm, setShowProposalForm] = useState(false);
   const [proposalData, setProposalData] = useState({
-    coverLetter: "",
+    coverLetter: '',
     bidAmount: 0,
     estimatedTime: 1,
   });
@@ -38,13 +38,13 @@ export function JobDetailPage() {
       const jobData = await jobApi.getById(id!);
       setJob(jobData);
     } catch (error) {
-      console.error("Failed to load job:", error);
-      navigate("/jobs");
+      console.error('Failed to load job:', error);
+      navigate('/jobs');
       return;
     }
 
     try {
-      if (isAuthenticated && user?.role === "freelancer") {
+      if (isAuthenticated && user?.role === 'freelancer') {
         const proposals = await proposalApi.getMyProposals();
         const existingProposal = proposals.find((p) => p.jobId === id);
         if (existingProposal) {
@@ -52,13 +52,15 @@ export function JobDetailPage() {
         }
       }
     } catch (error) {
-      console.error("Failed to load proposals:", error);
+      console.error('Failed to load proposals:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmitProposal = async (event: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmitProposal = async (
+    event: SyntheticEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
     if (!id) return;
 
@@ -71,7 +73,7 @@ export function JobDetailPage() {
       navigate(`/jobs/${id}`);
       window.location.reload();
     } catch (error) {
-      console.error("Failed to submit proposal:", error);
+      console.error('Failed to submit proposal:', error);
     } finally {
       setSubmitting(false);
     }
@@ -79,9 +81,9 @@ export function JobDetailPage() {
 
   const renderStatusBadge = (status: string) => (
     <span
-      className={`badge ${statusBadgeClasses[status] ?? "bg-secondary"} text-uppercase`}
+      className={`badge ${statusBadgeClasses[status] ?? 'bg-secondary'} text-uppercase`}
     >
-      {status.replace("_", " ")}
+      {status.replace('_', ' ')}
     </span>
   );
 
@@ -109,9 +111,9 @@ export function JobDetailPage() {
   }
 
   const isClient = user?.id === job.client;
-  const isOpen = job.status === "open";
+  const isOpen = job.status === 'open';
   console.log(job);
-  console.log(isAuthenticated, isClient, isOpen, proposal, user)
+  console.log(isAuthenticated, isClient, isOpen, proposal, user);
   return (
     <div className="container py-5">
       <Link to="/jobs" className="btn btn-link mb-4 px-0">
@@ -128,7 +130,7 @@ export function JobDetailPage() {
                   <div className="text-muted small">
                     Posted {new Date(job.createdAt).toLocaleDateString()}
                     <span className="text-muted mx-2">•</span>
-                    Deadline{" "}
+                    Deadline{' '}
                     {new Date(job.deadline).toLocaleDateString() ||
                       job.deadline}
                   </div>
@@ -160,7 +162,7 @@ export function JobDetailPage() {
                     <p className="fw-semibold mb-0">
                       ${job.budget}
                       <span className="text-muted small">
-                        {job.budgetType === "hourly" ? " /hr" : " fixed price"}
+                        {job.budgetType === 'hourly' ? ' /hr' : ' fixed price'}
                       </span>
                     </p>
                   </div>
@@ -193,7 +195,7 @@ export function JobDetailPage() {
               <div className="d-flex flex-column gap-1">
                 <span className="fs-3 fw-bold text-primary">${job.budget}</span>
                 <span className="text-muted">
-                  {job.budgetType === "hourly" ? "Per hour" : "Fixed price"}
+                  {job.budgetType === 'hourly' ? 'Per hour' : 'Fixed price'}
                 </span>
               </div>
             </div>
@@ -294,10 +296,11 @@ export function JobDetailPage() {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h5 className="mb-0">Your Proposal</h5>
                   <span
-                    className={`badge ${proposal.status === "accepted"
-                      ? "bg-success"
-                      : "bg-secondary"
-                      } text-uppercase`}
+                    className={`badge ${
+                      proposal.status === 'accepted'
+                        ? 'bg-success'
+                        : 'bg-secondary'
+                    } text-uppercase`}
                   >
                     {proposal.status}
                   </span>
