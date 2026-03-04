@@ -41,7 +41,7 @@ export function RegisterPage() {
         data.username,
         data.password,
         data.role,
-        profilePicture || undefined
+        profilePicture || undefined,
       );
       navigate('/login');
     } catch (err) {
@@ -92,8 +92,9 @@ export function RegisterPage() {
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className={`btn btn-outline-primary flex-fill text-start ${selectedRole === option.value ? 'active' : ''
-                        }`}
+                      className={`btn btn-outline-primary flex-fill text-start ${
+                        selectedRole === option.value ? 'active' : ''
+                      }`}
                     >
                       <input
                         {...register('role')}
@@ -143,9 +144,10 @@ export function RegisterPage() {
                   error={errors.password?.message}
                 />
 
-<div className="mb-2">
+                <div className="mb-2">
                   <label className="form-label fw-medium text-dark small mb-1">
-                    Profile Picture <span className="text-muted fw-normal">(Optional)</span>
+                    Profile Picture{' '}
+                    <span className="text-muted fw-normal">(Optional)</span>
                   </label>
                   <input
                     type="file"
@@ -162,7 +164,10 @@ export function RegisterPage() {
                     className="form-check-input"
                     id="agreedToTerms"
                   />
-                  <label className="form-check-label text-muted small" htmlFor="agreedToTerms">
+                  <label
+                    className="form-check-label text-muted small"
+                    htmlFor="agreedToTerms"
+                  >
                     I agree to the{' '}
                     <Link to="/terms" className="text-primary" target="_blank">
                       Terms and Conditions
@@ -175,7 +180,7 @@ export function RegisterPage() {
                   </p>
                 )}
 
-<Button
+                <Button
                   type="submit"
                   variant="primary"
                   isLoading={isSubmitting}

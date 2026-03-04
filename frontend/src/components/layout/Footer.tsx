@@ -17,7 +17,7 @@ const footerColumns = [
       { label: 'Press', to: '/press' },
     ],
   },
-{
+  {
     title: 'Support',
     items: [
       { label: 'Help Center', to: '/help' },

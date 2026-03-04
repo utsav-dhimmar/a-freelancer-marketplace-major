@@ -110,7 +110,10 @@ export const createContract = asyncHandler(
     }
 
     // Check if user is the job owner
-    const job = proposal.job as { client: { _id: string }; _id: string };
+    const job = proposal.job as unknown as {
+      client: { _id: string };
+      _id: string;
+    };
     if (String(job.client._id) !== String(req.user._id)) {
       throw new ApiError(
         HTTP_STATUS.FORBIDDEN,

@@ -15,7 +15,7 @@ interface AuthContextType {
     username: string,
     password: string,
     role: string,
-    profilePicture?: File
+    profilePicture?: File,
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -75,9 +75,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     username: string,
     password: string,
     role: string,
-    profilePicture?: File
+    profilePicture?: File,
   ) => {
-    await authApi.register({ email, fullname, username, password, role, profilePicture });
+    await authApi.register({
+      email,
+      fullname,
+      username,
+      password,
+      role,
+      profilePicture,
+    });
   };
 
   const logout = async () => {

@@ -65,7 +65,7 @@ export const getProposalByProposalId = asyncHandler(
     // Check if user is either the freelancer or the job owner
     const isFreelancer =
       String(proposal.freelancer._id) === String(req.user._id);
-    const job = proposal.job as { client: { _id: ObjectId } };
+    const job = proposal.job as unknown as { client: { _id: ObjectId } };
     const isJobOwner = String(job.client._id) === String(req.user._id);
 
     if (!isFreelancer && !isJobOwner) {
@@ -267,7 +267,10 @@ export const updateProposalStatus = asyncHandler(
     }
 
     // Check if user is the job owner
-    const job = proposal.job as { client: { _id: string }; _id: string };
+    const job = proposal.job as unknown as {
+      client: { _id: string };
+      _id: string;
+    };
     const isJobOwner = String(job.client._id) === String(req.user._id);
     if (!isJobOwner) {
       throw new ApiError(

@@ -12,7 +12,8 @@ import type {
   ApiResponse,
 } from '../types';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+export const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 export const STATIC_URL = API_URL.replace('/api', '');
 
 const api = axios.create({
@@ -140,13 +141,16 @@ export const authApi = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      }
+      },
     );
     return response.data.data;
   },
 
   login: async (data: { email: string; password: string }) => {
-    const response = await api.post<ApiResponse<IAuthResponse>>('/users/login', data);
+    const response = await api.post<ApiResponse<IAuthResponse>>(
+      '/users/login',
+      data,
+    );
     const loginData = response.data.data;
     if (loginData.accessToken) {
       localStorage.setItem('accessToken', loginData.accessToken);
@@ -185,7 +189,9 @@ export const jobApi = {
     status?: string;
     skills?: string;
   }) => {
-    const response = await api.get<ApiResponse<{ jobs: IJob[]; total: number }>>('/jobs', {
+    const response = await api.get<
+      ApiResponse<{ jobs: IJob[]; total: number }>
+    >('/jobs', {
       params,
     });
     return response.data.data;
@@ -202,7 +208,10 @@ export const jobApi = {
   },
 
   update: async (id: string, data: Partial<IJob>) => {
-    const response = await api.put<ApiResponse<{ job: IJob }>>(`/jobs/${id}`, data);
+    const response = await api.put<ApiResponse<{ job: IJob }>>(
+      `/jobs/${id}`,
+      data,
+    );
     return response.data.data.job;
   },
 
@@ -211,37 +220,51 @@ export const jobApi = {
   },
 
   myJobs: async () => {
-    const response = await api.get<ApiResponse<{ jobs: IJob[] }>>('/jobs/my-jobs');
+    const response =
+      await api.get<ApiResponse<{ jobs: IJob[] }>>('/jobs/my-jobs');
     return response.data.data.jobs;
   },
 };
 
 export const freelancerApi = {
   getAll: async (params?: { search?: string; skills?: string }) => {
-    const response = await api.get<ApiResponse<{
-      freelancers: IFreelancer[];
-      total: number;
-    }>>('/freelancers', { params });
+    const response = await api.get<
+      ApiResponse<{
+        freelancers: IFreelancer[];
+        total: number;
+      }>
+    >('/freelancers', { params });
     return response.data.data;
   },
 
   getById: async (id: string) => {
-    const response = await api.get<ApiResponse<{ freelancer: IFreelancer }>>(`/freelancers/${id}`);
+    const response = await api.get<ApiResponse<{ freelancer: IFreelancer }>>(
+      `/freelancers/${id}`,
+    );
     return response.data.data.freelancer;
   },
 
   getMe: async () => {
-    const response = await api.get<ApiResponse<{ freelancer: IFreelancer }>>('/freelancers/me');
+    const response =
+      await api.get<ApiResponse<{ freelancer: IFreelancer }>>(
+        '/freelancers/me',
+      );
     return response.data.data.freelancer;
   },
 
   create: async (data: Partial<IFreelancer>) => {
-    const response = await api.post<ApiResponse<{ freelancer: IFreelancer }>>('/freelancers', data);
+    const response = await api.post<ApiResponse<{ freelancer: IFreelancer }>>(
+      '/freelancers',
+      data,
+    );
     return response.data.data.freelancer;
   },
 
   update: async (_id: string, data: Partial<IFreelancer>) => {
-    const response = await api.put<ApiResponse<{ freelancer: IFreelancer }>>(`/freelancers`, data);
+    const response = await api.put<ApiResponse<{ freelancer: IFreelancer }>>(
+      `/freelancers`,
+      data,
+    );
     return response.data.data.freelancer;
   },
 
@@ -278,73 +301,105 @@ export const proposalApi = {
 
     // job, coverLetter, bidAmount, estimatedTime
   }) => {
-    const response = await api.post<ApiResponse<{ proposal: IProposal }>>('/proposals', data);
+    const response = await api.post<ApiResponse<{ proposal: IProposal }>>(
+      '/proposals',
+      data,
+    );
     return response.data.data.proposal;
   },
 
   getByJob: async (jobId: string) => {
-    const response = await api.get<ApiResponse<{ proposals: IProposal[] }>>(`/proposals/job/${jobId}`);
+    const response = await api.get<ApiResponse<{ proposals: IProposal[] }>>(
+      `/proposals/job/${jobId}`,
+    );
     return response.data.data.proposals;
   },
 
   getMyProposals: async () => {
-    const response = await api.get<ApiResponse<{ proposals: IProposal[] }>>('/proposals/my-proposals');
+    const response = await api.get<ApiResponse<{ proposals: IProposal[] }>>(
+      '/proposals/my-proposals',
+    );
     return response.data.data.proposals;
   },
 
   update: async (id: string, data: Partial<IProposal>) => {
-    const response = await api.put<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}`, data);
+    const response = await api.put<ApiResponse<{ proposal: IProposal }>>(
+      `/proposals/${id}`,
+      data,
+    );
     return response.data.data.proposal;
   },
 
   withdraw: async (id: string) => {
-    const response = await api.delete<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}`);
+    const response = await api.delete<ApiResponse<{ proposal: IProposal }>>(
+      `/proposals/${id}`,
+    );
     return response.data?.data?.proposal || null;
   },
 
   accept: async (id: string) => {
-    const response = await api.patch<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/status`, { status: 'accepted' });
+    const response = await api.patch<ApiResponse<{ proposal: IProposal }>>(
+      `/proposals/${id}/status`,
+      { status: 'accepted' },
+    );
     return response.data.data.proposal;
   },
 
   reject: async (id: string) => {
-    const response = await api.patch<ApiResponse<{ proposal: IProposal }>>(`/proposals/${id}/status`, { status: 'rejected' });
+    const response = await api.patch<ApiResponse<{ proposal: IProposal }>>(
+      `/proposals/${id}/status`,
+      { status: 'rejected' },
+    );
     return response.data.data.proposal;
   },
 };
 
 export const contractApi = {
   create: async (data: { jobId: string; proposalId: string }) => {
-    const response = await api.post<ApiResponse<{ contract: IContract }>>('/contracts', data);
+    const response = await api.post<ApiResponse<{ contract: IContract }>>(
+      '/contracts',
+      data,
+    );
     return response.data.data.contract;
   },
 
   getMyContracts: async () => {
-    const response = await api.get<ApiResponse<{ contracts: IContract[] }>>('/contracts');
+    const response =
+      await api.get<ApiResponse<{ contracts: IContract[] }>>('/contracts');
     return response.data.data.contracts;
   },
 
   getById: async (id: string) => {
-    const response = await api.get<ApiResponse<{ contract: IContract }>>(`/contracts/${id}`);
+    const response = await api.get<ApiResponse<{ contract: IContract }>>(
+      `/contracts/${id}`,
+    );
     return response.data.data.contract;
   },
 
   submitWork: async (id: string, workDescription: string) => {
-    const response = await api.patch<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/submit`, {
-      workDescription,
-    });
+    const response = await api.patch<ApiResponse<{ contract: IContract }>>(
+      `/contracts/${id}/submit`,
+      {
+        workDescription,
+      },
+    );
     return response.data.data.contract;
   },
 
   completeContract: async (id: string) => {
-    const response = await api.patch<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/complete`);
+    const response = await api.patch<ApiResponse<{ contract: IContract }>>(
+      `/contracts/${id}/complete`,
+    );
     return response.data.data.contract;
   },
 
   raiseDispute: async (id: string, reason: string) => {
-    const response = await api.patch<ApiResponse<{ contract: IContract }>>(`/contracts/${id}/dispute`, {
-      reason,
-    });
+    const response = await api.patch<ApiResponse<{ contract: IContract }>>(
+      `/contracts/${id}/dispute`,
+      {
+        reason,
+      },
+    );
     return response.data.data.contract;
   },
 };
@@ -355,6 +410,7 @@ export interface IChatMessage {
   senderName: string;
   message: string;
   timestamp: string;
+  readBy?: string[];
 }
 
 export interface IChatInfo {
@@ -374,13 +430,19 @@ export const chatApi = {
     return response.data.data.message;
   },
 
-  getMessages: async (contractId: string, page: number = 1, limit: number = 50) => {
-    const response = await api.get<ApiResponse<{
-      messages: IChatMessage[];
-      total: number;
-      page: number;
-      totalPages: number;
-    }>>(`/chat/${contractId}/messages`, { params: { page, limit } });
+  getMessages: async (
+    contractId: string,
+    page: number = 1,
+    limit: number = 50,
+  ) => {
+    const response = await api.get<
+      ApiResponse<{
+        messages: IChatMessage[];
+        total: number;
+        page: number;
+        totalPages: number;
+      }>
+    >(`/chat/${contractId}/messages`, { params: { page, limit } });
     return response.data.data;
   },
 

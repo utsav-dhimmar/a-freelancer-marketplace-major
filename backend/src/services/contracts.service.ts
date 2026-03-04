@@ -1,15 +1,5 @@
 import { Contract, type IContract } from '../model/contracts.model.js';
-
-/**
- * Contract creation data
- */
-export interface CreateContractData {
-  job: string;
-  client: string;
-  freelancer: string;
-  proposal: string;
-  amount: number;
-}
+import type { CreateContractData } from '../types/contract.types.js';
 
 export class ContractService {
   /**

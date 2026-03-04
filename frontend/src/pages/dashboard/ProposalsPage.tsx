@@ -21,8 +21,12 @@ export function ProposalsPage() {
       setProposals(data);
       const jobIds = [...new Set(data.map((p) => p.job._id))];
 
-      const jobResults = await Promise.all(jobIds.map((id) => jobApi.getById(id)));
-      const jobData = Object.fromEntries(jobResults.map((job) => [job._id, job]));
+      const jobResults = await Promise.all(
+        jobIds.map((id) => jobApi.getById(id)),
+      );
+      const jobData = Object.fromEntries(
+        jobResults.map((job) => [job._id, job]),
+      );
 
       setJobs(jobData);
     } catch (error) {

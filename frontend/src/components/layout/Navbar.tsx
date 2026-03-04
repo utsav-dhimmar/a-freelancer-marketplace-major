@@ -122,7 +122,8 @@ export function Navbar() {
                       {initial}
                     </span>
                     <span className="d-none d-lg-inline">
-                      {(user?.fullname || user?.username)?.split(' ')[0] || 'Profile'}
+                      {(user?.fullname || user?.username)?.split(' ')[0] ||
+                        'Profile'}
                     </span>
                   </button>
                   <ul

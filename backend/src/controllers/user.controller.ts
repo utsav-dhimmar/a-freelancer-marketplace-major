@@ -49,7 +49,9 @@ export const register = asyncHandler(
     }
 
     // Build profile picture path if provided
-    const profilePicture = req.file ? `/profiles/${req.file.filename}` : undefined;
+    const profilePicture = req.file
+      ? `/profiles/${req.file.filename}`
+      : undefined;
 
     // Create user with role and profile picture
     const user = await userService.createUser({
