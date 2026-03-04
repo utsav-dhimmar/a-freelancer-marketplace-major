@@ -11,9 +11,11 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
+    fullname: string,
     username: string,
     password: string,
     role: string,
+    profilePicture?: File
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -69,11 +71,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (
     email: string,
+    fullname: string,
     username: string,
     password: string,
     role: string,
+    profilePicture?: File
   ) => {
-    await authApi.register({ email, username, password, role });
+    await authApi.register({ email, fullname, username, password, role, profilePicture });
   };
 
   const logout = async () => {

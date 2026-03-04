@@ -48,16 +48,8 @@ export const register = asyncHandler(
       throw new ApiError(HTTP_STATUS.CONFLICT, 'Username already taken');
     }
 
-    // Validate profile picture is provided
-    if (!req.file) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Profile picture is required',
-      );
-    }
-
-    // Build profile picture path
-    const profilePicture = `/profiles/${req.file.filename}`;
+    // Build profile picture path if provided
+    const profilePicture = req.file ? `/profiles/${req.file.filename}` : undefined;
 
     // Create user with role and profile picture
     const user = await userService.createUser({
@@ -66,7 +58,7 @@ export const register = asyncHandler(
       email,
       password,
       role: userRole,
-      profilePicture,
+      ...(profilePicture && { profilePicture }),
     });
 
     // Generate tokens

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { freelancerApi, authApi } from '../../api';
+import { freelancerApi, authApi, STATIC_URL } from '../../api';
 import { Card, Button, Input, TextArea } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IFreelancer, IPortfolioItem } from '../../types';
@@ -329,7 +329,7 @@ export function MyProfilePage() {
             <div className="text-center mb-3">
               {user?.profilePicture ? (
                 <img
-                  src={user.profilePicture}
+                  src={`${STATIC_URL}${user.profilePicture}`}
                   alt="Profile"
                   className="rounded-circle"
                   style={{

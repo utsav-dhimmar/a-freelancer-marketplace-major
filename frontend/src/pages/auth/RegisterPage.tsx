@@ -10,6 +10,13 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setProfilePicture(e.target.files[0]);
+    }
+  };
 
   const {
     register,
@@ -28,7 +35,14 @@ export function RegisterPage() {
   const onSubmit = async (data: RegisterInput) => {
     try {
       setError(null);
-      await registerUser(data.email, data.username, data.password, data.role);
+      await registerUser(
+        data.email,
+        data.fullname,
+        data.username,
+        data.password,
+        data.role,
+        profilePicture || undefined
+      );
       navigate('/login');
     } catch (err) {
       setError('Registration failed. Please try again.');
@@ -78,9 +92,8 @@ export function RegisterPage() {
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className={`btn btn-outline-primary flex-fill text-start ${
-                        selectedRole === option.value ? 'active' : ''
-                      }`}
+                      className={`btn btn-outline-primary flex-fill text-start ${selectedRole === option.value ? 'active' : ''
+                        }`}
                     >
                       <input
                         {...register('role')}
@@ -109,6 +122,13 @@ export function RegisterPage() {
                   error={errors.email?.message}
                 />
                 <Input
+                  label="Fullname"
+                  type="text"
+                  placeholder="John Doe"
+                  {...register('fullname')}
+                  error={errors.fullname?.message}
+                />
+                <Input
                   label="Username"
                   type="text"
                   placeholder="johndoe"
@@ -122,6 +142,19 @@ export function RegisterPage() {
                   {...register('password')}
                   error={errors.password?.message}
                 />
+
+                <div className="mb-2">
+                  <label className="form-label fw-medium text-dark small mb-1">
+                    Profile Picture <span className="text-muted fw-normal">(Optional)</span>
+                  </label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </div>
+
                 <Button
                   type="submit"
                   isLoading={isSubmitting}

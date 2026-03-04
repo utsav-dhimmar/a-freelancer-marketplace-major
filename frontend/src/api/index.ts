@@ -12,7 +12,8 @@ import type {
   ApiResponse,
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+export const STATIC_URL = API_URL.replace('/api', '');
 
 const api = axios.create({
   baseURL: API_URL,
@@ -119,10 +120,27 @@ export const authApi = {
     username: string;
     password: string;
     role: string;
+    fullname: string;
+    profilePicture?: File;
   }) => {
+    const formData = new FormData();
+    formData.append('email', data.email);
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+    formData.append('role', data.role);
+    formData.append('fullname', data.fullname);
+    if (data.profilePicture) {
+      formData.append('profilePicture', data.profilePicture);
+    }
+
     const response = await api.post<ApiResponse<IAuthResponse>>(
       '/users/register',
-      data,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
     return response.data.data;
   },
