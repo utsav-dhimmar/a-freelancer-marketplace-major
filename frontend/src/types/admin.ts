@@ -70,7 +70,7 @@ export interface IAdminReview {
   updatedAt: string;
 }
 
-export interface IAdminJob extends Omit<IJob, 'clientId'> {
+export interface IAdminJob extends Omit<IJob, 'client'> {
   client?: {
     _id: string;
     username: string;

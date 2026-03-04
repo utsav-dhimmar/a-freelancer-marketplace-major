@@ -1,3 +1,5 @@
+export * from "./Api";
+
 export type UserRole = "client" | "admin" | "freelancer";
 
 export type JobStatus = "open" | "in_progress" | "completed" | "cancelled";
@@ -29,7 +31,7 @@ export interface IAuthResponse {
 
 export interface IJob {
   _id: string;
-  clientId: string;
+  client: string;
   title: string;
   description: string;
   skillsRequired: string[];
@@ -62,7 +64,7 @@ export interface IPortfolioItem {
 
 export interface IProposal {
   _id: string;
-  jobId: string;
+  job: IJob;
   freelancerId: string;
   coverLetter: string;
   proposedAmount: number;

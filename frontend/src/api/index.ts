@@ -271,10 +271,12 @@ export const freelancerApi = {
 
 export const proposalApi = {
   submit: async (data: {
-    jobId: string;
+    job: string;
     coverLetter: string;
-    proposedAmount: number;
-    estimatedDuration: number;
+    bidAmount: number;
+    estimatedTime: number;
+
+    // job, coverLetter, bidAmount, estimatedTime
   }) => {
     const response = await api.post<ApiResponse<{ proposal: IProposal }>>('/proposals', data);
     return response.data.data.proposal;

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { type SyntheticEvent, useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { jobApi, proposalApi } from "../../api";
 import { Button, Input, TextArea } from "../../components/ui";
@@ -22,8 +22,8 @@ export function JobDetailPage() {
   const [showProposalForm, setShowProposalForm] = useState(false);
   const [proposalData, setProposalData] = useState({
     coverLetter: "",
-    proposedAmount: 0,
-    estimatedDuration: 1,
+    bidAmount: 0,
+    estimatedTime: 1,
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -58,14 +58,14 @@ export function JobDetailPage() {
     }
   };
 
-  const handleSubmitProposal = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmitProposal = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!id) return;
 
     setSubmitting(true);
     try {
       await proposalApi.submit({
-        jobId: id,
+        job: id,
         ...proposalData,
       });
       navigate(`/jobs/${id}`);
@@ -108,9 +108,10 @@ export function JobDetailPage() {
     );
   }
 
-  const isClient = user?._id === job.clientId;
+  const isClient = user?.id === job.client;
   const isOpen = job.status === "open";
   console.log(job);
+  console.log(isAuthenticated, isClient, isOpen, proposal, user)
   return (
     <div className="container py-5">
       <Link to="/jobs" className="btn btn-link mb-4 px-0">
@@ -293,11 +294,10 @@ export function JobDetailPage() {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h5 className="mb-0">Your Proposal</h5>
                   <span
-                    className={`badge ${
-                      proposal.status === "accepted"
-                        ? "bg-success"
-                        : "bg-secondary"
-                    } text-uppercase`}
+                    className={`badge ${proposal.status === "accepted"
+                      ? "bg-success"
+                      : "bg-secondary"
+                      } text-uppercase`}
                   >
                     {proposal.status}
                   </span>
