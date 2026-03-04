@@ -51,10 +51,45 @@ app.use('/api/contracts', contractRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 
-app.use((req, res) => {
-  return res
-    .status(HTTP_STATUS.BAD_REQUEST)
-    .json(new ApiError(HTTP_STATUS.BAD_REQUEST, `${req.path} is not found`));
+// Error handling for 404/Unknown routes
+app.use((req, res, next) => {
+  const error = new ApiError(HTTP_STATUS.NOT_FOUND, `${req.path} is not found`);
+  next(error);
+});
+
+// Global Error Handler
+app.use((err: any, req: any, res: any, next: any) => {
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Internal Server Error';
+  let errors = err.errors || [];
+
+  // Handle Mongoose Validation Error
+  if (err.name === 'ValidationError') {
+    statusCode = HTTP_STATUS.BAD_REQUEST;
+    message = 'Validation Failed';
+    // Format mongoose validation errors if needed, but keeping it simple for now as per current logic
+    errors = err.errors;
+  }
+
+  // Handle Mongoose Cast Error (e.g., invalid ObjectId)
+  if (err.name === 'CastError') {
+    statusCode = HTTP_STATUS.BAD_REQUEST;
+    message = `Invalid ${err.path}: ${err.value}`;
+  }
+
+  console.error(
+    `[ERROR] ${req.method} ${req.url} - ${statusCode} - ${message}`,
+  );
+  if (err.stack && process.env.NODE_ENV !== 'production') {
+    // console.error(err.stack);
+  }
+
+  res.status(statusCode).json({
+    success: false,
+    message,
+    errors,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+  });
 });
 
 export default app;

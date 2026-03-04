@@ -27,10 +27,7 @@ export class ProposalService {
   async createProposal(data: CreateProposalData): Promise<IProposal> {
     const proposal = new Proposal(data);
     await proposal.save();
-    return proposal.populate([
-      { path: 'job' },
-      { path: 'freelancer', select: '-password -refreshToken' },
-    ]);
+    return proposal;
   }
 
   /**
