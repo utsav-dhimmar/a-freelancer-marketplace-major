@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
  */
 export function AdminRootLayout() {
   return (
-    <div className="admin-root">
+    <div>
       <Outlet />
     </div>
   );

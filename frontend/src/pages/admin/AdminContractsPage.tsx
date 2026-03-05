@@ -1,15 +1,16 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { adminApi } from '../../api/admin';
+import { formatCurrency } from '../../constants/currency';
+import type { AdminContractFilters, IAdminContract } from '../../types/admin';
+import type { Toast } from './components';
 import {
-  AdminLayout,
   AdminBadge,
+  AdminEmpty,
+  AdminLayout,
+  AdminLoading,
   AdminPagination,
   AdminToast,
-  AdminLoading,
-  AdminEmpty,
 } from './components';
-import type { Toast } from './components';
-import { adminApi } from '../../api/admin';
-import type { IAdminContract, AdminContractFilters } from '../../types/admin';
 
 const CONTRACT_STATUSES = [
   'active',
@@ -24,10 +25,10 @@ const TABLE_HEADINGS = [
   'Job',
   'Client',
   'Freelancer',
-  'Amont',
+  'Amount',
   'Status',
   'Started',
-  'Actions',
+  'Update Status',
 ];
 
 export function AdminContractsPage() {
@@ -103,11 +104,14 @@ export function AdminContractsPage() {
     <AdminLayout title="Contract Management">
       <AdminToast toasts={toasts} />
 
-      <div className="admin-table-card">
-        <div className="admin-table-header">
-          <h2>All Contracts ({total})</h2>
-          <div className="admin-table-filters">
+      <div className="card border-0 shadow-sm overflow-hidden">
+        <div className="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+          <h5 className="mb-0 fw-bold text-dark">All Contracts ({total})</h5>
+          <div className="d-flex align-items-center gap-2">
+            <span className="small text-muted fw-medium d-none d-sm-inline">Filter:</span>
             <select
+              className="form-select form-select-sm bg-light"
+              style={{ width: 'auto' }}
               value={filters.status || ''}
               onChange={(e) => {
                 setPage(1);
@@ -130,33 +134,40 @@ export function AdminContractsPage() {
         {loading ? (
           <AdminLoading message="Loading contracts..." />
         ) : contracts.length === 0 ? (
-          <AdminEmpty icon="📄" message="No contracts found" />
+          <div className="p-4">
+            <AdminEmpty message="No contracts found" />
+          </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="admin-table">
-                <thead>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
                   <tr>
                     {TABLE_HEADINGS.map((heading) => (
-                      <th key={heading}>{heading}</th>
+                      <th key={heading} className="text-uppercase small fw-bold text-muted px-4 py-3">{heading}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {contracts.map((c) => (
                     <tr key={c._id}>
-                      <td>
-                        <strong>{c.job?.title || '—'}</strong>
+                      <td className="px-4">
+                        <div className="fw-bold text-dark">{c.job?.title || '—'}</div>
                       </td>
                       <td>{c.client?.username || '—'}</td>
                       <td>{c.freelancer?.username || '—'}</td>
-                      <td>${c.amount?.toLocaleString() || '0'}</td>
+                      <td className="fw-medium text-dark">
+                        {formatCurrency(
+                          c.amount as unknown as number,
+                        ) || '0'}
+                      </td>
                       <td>
                         <AdminBadge variant={c.status}>{c.status}</AdminBadge>
                       </td>
                       <td>{formatDate(c.startDate || c.createdAt)}</td>
-                      <td>
+                      <td className="px-4">
                         <select
+                          className="form-select form-select-sm rounded-pill"
                           value={c.status}
                           disabled={updatingId === c._id}
                           onChange={(e) =>
@@ -166,13 +177,7 @@ export function AdminContractsPage() {
                                 .value as (typeof CONTRACT_STATUSES)[number],
                             )
                           }
-                          style={{
-                            fontSize: '0.8rem',
-                            padding: '0.3rem 0.5rem',
-                            borderRadius: '6px',
-                            border: '1px solid #e2e8f0',
-                            cursor: 'pointer',
-                          }}
+                          style={{ cursor: 'pointer', maxWidth: '140px' }}
                         >
                           {CONTRACT_STATUSES.map((s) => (
                             <option key={s} value={s}>

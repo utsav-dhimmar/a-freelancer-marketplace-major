@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { jobApi } from '../../api';
 import { Button } from '../../components/ui';
-import type { IJob } from '../../types';
 import { formatCurrency } from '../../constants/currency';
+import type { IJob } from '../../types';
 
 const statusBadgeClasses: Record<string, string> = {
   open: 'bg-primary',
@@ -16,7 +15,6 @@ const statusBadgeClasses: Record<string, string> = {
 export function HomePage() {
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
 
   useEffect(() => {
     void loadJobs();
@@ -34,19 +32,6 @@ export function HomePage() {
     }
   };
 
-  const handleSearch = async (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    try {
-      const data = await jobApi.getAll({ search, status: 'open' });
-      setJobs(data.jobs.slice(0, 6));
-    } catch (error) {
-      console.error('Search failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const renderStatusBadge = (status: string) => (
     <span
       className={`badge ${statusBadgeClasses[status] ?? 'bg-secondary'} text-uppercase`}
@@ -57,47 +42,6 @@ export function HomePage() {
 
   return (
     <div className="d-flex flex-column">
-      <section className="py-5 bg-primary text-light overflow-hidden position-relative">
-        <div className="container py-5 text-center position-relative">
-          <span className="badge bg-white text-primary rounded-pill px-3 py-2 fw-semibold shadow-sm">
-            The Future of Work
-          </span>
-          <h1 className="display-5 fw-bold mt-3 mb-3">
-            Where exceptional <br />
-            <span className="text-white">talent</span> meets extraordinary{' '}
-            <span className="text-white-50">opportunities</span>
-          </h1>
-          <p className="lead text-white-50 mb-4">
-            Connect with world-class freelancers and clients. Build your
-            reputation. Do your best work.
-          </p>
-
-          <form
-            onSubmit={handleSearch}
-            className="row g-2 justify-content-center"
-          >
-            <div className="col-12 col-md-8">
-              <div className="input-group rounded-pill shadow-sm bg-white">
-                <input
-                  type="text"
-                  className="form-control border-0 rounded-start-pill px-4"
-                  placeholder="Search for jobs, skills, or categories..."
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  className="rounded-end-pill px-4"
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
-
       <section className="py-5">
         <div className="container">
           <div className="d-flex flex-column flex-md-row align-items-start justify-content-between mb-4 gap-2">

@@ -137,63 +137,70 @@ export function AdminUsersPage() {
     <AdminLayout title="User Management">
       <AdminToast toasts={toasts} />
 
-      <div className="admin-table-card">
-        <div className="admin-table-header">
-          <h2>All Users ({total})</h2>
+      <div className="card border-0 shadow-sm overflow-hidden">
+        <div className="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+          <h5 className="mb-0 fw-bold">All Users ({total})</h5>
         </div>
 
         {loading ? (
           <AdminLoading message="Loading users..." />
         ) : users.length === 0 ? (
-          <AdminEmpty icon="👥" message="No users found" />
+          <div className="p-4">
+            <AdminEmpty message="No users found" />
+          </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="admin-table">
-                <thead>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
                   <tr>
                     {TABLE_HEADINGS.map((heading) => (
-                      <th key={heading}>{heading}</th>
+                      <th
+                        key={heading}
+                        className="text-uppercase small fw-bold text-muted px-4 py-3"
+                        style={{ letterSpacing: '0.5px' }}
+                      >
+                        {heading}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((user) => (
                     <tr key={user._id}>
-                      <td>
-                        <strong>{user.username}</strong>
-                        <br />
-                        <small style={{ color: '#94a3b8' }}>
+                      <td className="px-4">
+                        <div className="fw-bold text-dark">{user.username}</div>
+                        <div className="small text-muted">
                           {(user as unknown as { fullname?: string })
                             .fullname ||
                             user.name ||
                             '—'}
-                        </small>
+                        </div>
                       </td>
                       <td>{user.email}</td>
                       <td>
                         <AdminBadge variant={user.role}>{user.role}</AdminBadge>
                       </td>
                       <td>{formatDate(user.createdAt)}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '0.35rem' }}>
+                      <td className="px-4">
+                        <div className="d-flex gap-2">
                           <button
                             type="button"
-                            className="admin-action-btn view"
+                            className="btn btn-sm btn-outline-primary rounded-pill px-3"
                             onClick={() => handleView(user._id!)}
                           >
                             View
                           </button>
                           <button
                             type="button"
-                            className="admin-action-btn edit"
+                            className="btn btn-sm btn-outline-secondary rounded-pill px-3"
                             onClick={() => openEdit(user)}
                           >
                             Edit
                           </button>
                           <button
                             type="button"
-                            className="admin-action-btn delete"
+                            className="btn btn-sm btn-outline-danger rounded-pill px-3"
                             onClick={() => handleDelete(user._id!)}
                           >
                             Delete
@@ -222,11 +229,11 @@ export function AdminUsersPage() {
         isOpen={!!viewUser || viewLoading}
         onClose={() => !viewLoading && setViewUser(null)}
         loading={viewLoading}
-        className="admin-detail-modal"
+        maxWidth="520px"
         footer={
           <button
             type="button"
-            className="btn-cancel"
+            className="btn btn-secondary px-4 rounded-3"
             onClick={() => setViewUser(null)}
           >
             Close
@@ -235,47 +242,105 @@ export function AdminUsersPage() {
       >
         {viewUser && (
           <>
-            <div className="admin-detail-avatar">
-              {(viewUser.username || 'U').charAt(0).toUpperCase()}
+            <div className="text-center mb-4">
+              <div
+                className="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto mb-3 shadow-sm"
+                style={{ width: '80px', height: '80px', fontSize: '2rem' }}
+              >
+                {(viewUser.username || 'U').charAt(0).toUpperCase()}
+              </div>
+              <h5 className="fw-bold mb-0">{viewUser.username}</h5>
+              <p className="text-muted small">
+                {(viewUser as unknown as { fullname?: string }).fullname ||
+                  viewUser.name ||
+                  '—'}
+              </p>
             </div>
-            <div className="admin-detail-grid">
-              <div className="admin-detail-item">
-                <div className="detail-label">Username</div>
-                <div className="detail-value">{viewUser.username || '—'}</div>
-              </div>
-              <div className="admin-detail-item">
-                <div className="detail-label">Full Name</div>
-                <div className="detail-value">
-                  {(viewUser as unknown as { fullname?: string }).fullname ||
-                    viewUser.name ||
-                    '—'}
+
+            <div className="row g-3">
+              <div className="col-6">
+                <div className="p-3 bg-light rounded-3 border">
+                  <div
+                    className="text-uppercase small fw-bold text-muted mb-1"
+                    style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
+                  >
+                    Username
+                  </div>
+                  <div className="fw-semibold text-dark">
+                    {viewUser.username || '—'}
+                  </div>
                 </div>
               </div>
-              <div className="admin-detail-item">
-                <div className="detail-label">Email</div>
-                <div className="detail-value">{viewUser.email || '—'}</div>
-              </div>
-              <div className="admin-detail-item">
-                <div className="detail-label">Role</div>
-                <div className="detail-value">
-                  <AdminBadge variant={viewUser.role}>
-                    {viewUser.role}
-                  </AdminBadge>
+              <div className="col-6">
+                <div className="p-3 bg-light rounded-3 border">
+                  <div
+                    className="text-uppercase small fw-bold text-muted mb-1"
+                    style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
+                  >
+                    Full Name
+                  </div>
+                  <div className="fw-semibold text-dark">
+                    {(viewUser as unknown as { fullname?: string }).fullname ||
+                      viewUser.name ||
+                      '—'}
+                  </div>
                 </div>
               </div>
-              <div className="admin-detail-item">
-                <div className="detail-label">Joined</div>
-                <div className="detail-value">
-                  {formatDate(viewUser.createdAt)}
+              <div className="col-12">
+                <div className="p-3 bg-light rounded-3 border">
+                  <div
+                    className="text-uppercase small fw-bold text-muted mb-1"
+                    style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
+                  >
+                    Email Address
+                  </div>
+                  <div className="fw-semibold text-dark">
+                    {viewUser.email || '—'}
+                  </div>
                 </div>
               </div>
-              <div className="admin-detail-item">
-                <div className="detail-label">User ID</div>
-                <div
-                  className="detail-value"
-                  style={{ fontSize: '0.75rem', color: '#64748b' }}
-                >
-                  {viewUser._id}
+              <div className="col-6">
+                <div className="p-3 bg-light rounded-3 border">
+                  <div
+                    className="text-uppercase small fw-bold text-muted mb-1"
+                    style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
+                  >
+                    Account Role
+                  </div>
+                  <div>
+                    <AdminBadge variant={viewUser.role}>
+                      {viewUser.role}
+                    </AdminBadge>
+                  </div>
+                </div>
+              </div>
+              <div className="col-6">
+                <div className="p-3 bg-light rounded-3 border">
+                  <div
+                    className="text-uppercase small fw-bold text-muted mb-1"
+                    style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
+                  >
+                    Joined Date
+                  </div>
+                  <div className="fw-semibold text-dark">
+                    {formatDate(viewUser.createdAt)}
+                  </div>
+                </div>
+              </div>
+              <div className="col-12">
+                <div className="p-3 bg-light rounded-3 border">
+                  <div
+                    className="text-uppercase small fw-bold text-muted mb-1"
+                    style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
+                  >
+                    Internal User ID
+                  </div>
+                  <div
+                    className="text-muted small font-monospace"
+                    style={{ wordBreak: 'break-all' }}
+                  >
+                    {viewUser._id}
+                  </div>
                 </div>
               </div>
             </div>
@@ -284,60 +349,79 @@ export function AdminUsersPage() {
       </AdminModal>
 
       <AdminModal
-        title="Edit User"
+        title="Edit User Account"
         isOpen={!!editUser}
         onClose={() => setEditUser(null)}
         footer={
           <>
             <button
               type="button"
-              className="btn-cancel"
+              className="btn btn-light px-4 rounded-3 border"
               onClick={() => setEditUser(null)}
             >
               Cancel
             </button>
             <button
               type="button"
-              className="btn-save"
+              className="btn btn-primary px-4 rounded-3 fw-bold"
               disabled={saving}
               onClick={handleSave}
             >
+              {saving ? (
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              ) : null}
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </>
         }
       >
-        <div className="form-group">
-          <label>Username</label>
+        <div className="mb-3">
+          <label className="form-label small fw-bold text-muted text-uppercase">
+            Username
+          </label>
           <input
+            className="form-control rounded-3"
             value={editForm.username}
             onChange={(e) =>
               setEditForm({ ...editForm, username: e.target.value })
             }
           />
         </div>
-        <div className="form-group">
-          <label>Full Name</label>
+        <div className="mb-3">
+          <label className="form-label small fw-bold text-muted text-uppercase">
+            Full Name
+          </label>
           <input
+            className="form-control rounded-3"
             value={editForm.fullname}
             onChange={(e) =>
               setEditForm({ ...editForm, fullname: e.target.value })
             }
           />
         </div>
-        <div className="form-group">
-          <label>Email</label>
+        <div className="mb-3">
+          <label className="form-label small fw-bold text-muted text-uppercase">
+            Email Address
+          </label>
           <input
             type="email"
+            className="form-control rounded-3"
             value={editForm.email}
             onChange={(e) =>
               setEditForm({ ...editForm, email: e.target.value })
             }
           />
         </div>
-        <div className="form-group">
-          <label>Role</label>
+        <div className="mb-3">
+          <label className="form-label small fw-bold text-muted text-uppercase">
+            Account Role
+          </label>
           <select
+            className="form-select rounded-3"
             value={editForm.role}
             onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
           >

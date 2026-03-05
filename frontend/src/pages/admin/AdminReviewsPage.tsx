@@ -12,9 +12,9 @@ import type { IAdminReview } from '../../types/admin';
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <span className="admin-stars">
+    <span className="text-warning">
       {[1, 2, 3, 4, 5].map((star) => (
-        <span key={star} className={star <= rating ? '' : 'empty'}>
+        <span key={star} className={star <= rating ? 'me-1' : 'me-1 opacity-25 text-secondary'}>
           ★
         </span>
       ))}
@@ -87,70 +87,62 @@ export function AdminReviewsPage() {
     <AdminLayout title="Review Management">
       <AdminToast toasts={toasts} />
 
-      <div className="admin-table-card">
-        <div className="admin-table-header">
-          <h2>All Reviews ({total})</h2>
+      <div className="card border-0 shadow-sm overflow-hidden">
+        <div className="card-header bg-white border-bottom py-3 px-4">
+          <h5 className="mb-0 fw-bold text-dark">All Reviews ({total})</h5>
         </div>
 
         {loading ? (
           <AdminLoading message="Loading reviews..." />
         ) : reviews.length === 0 ? (
-          <AdminEmpty icon="⭐" message="No reviews found" />
+          <div className="p-4">
+            <AdminEmpty message="No reviews found" />
+          </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="admin-table">
-                <thead>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
                   <tr>
-                    <th>Reviewer</th>
-                    <th>Reviewee</th>
-                    <th>Rating</th>
-                    <th>Comment</th>
-                    <th>Date</th>
-                    <th>Actions</th>
+                    <th className="text-uppercase small fw-bold text-muted px-4 py-3">Reviewer</th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">Reviewee</th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">Rating</th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">Comment</th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">Date</th>
+                    <th className="text-uppercase small fw-bold text-muted px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {reviews.map((review) => (
                     <tr key={review._id}>
-                      <td>
-                        <strong>{review.reviewer?.username || '—'}</strong>
-                        <br />
-                        <small style={{ color: '#94a3b8' }}>
-                          {review.reviewer?.email || ''}
-                        </small>
+                      <td className="px-4">
+                        <div className="fw-bold text-dark">{review.reviewer?.username || '—'}</div>
+                        <div className="small text-muted">{review.reviewer?.email || ''}</div>
                       </td>
                       <td>
-                        <strong>{review.reviewee?.username || '—'}</strong>
-                        <br />
-                        <small style={{ color: '#94a3b8' }}>
-                          {review.reviewee?.email || ''}
-                        </small>
+                        <div className="fw-bold text-dark">{review.reviewee?.username || '—'}</div>
+                        <div className="small text-muted">{review.reviewee?.email || ''}</div>
                       </td>
                       <td>
                         <Stars rating={review.rating} />
                       </td>
                       <td>
                         <div
-                          style={{
-                            maxWidth: '250px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
+                          className="text-truncate text-muted small"
+                          style={{ maxWidth: '250px' }}
                           title={review.comment}
                         >
                           {review.comment || '—'}
                         </div>
                       </td>
-                      <td>{formatDate(review.createdAt)}</td>
-                      <td>
+                      <td className="small text-muted">{formatDate(review.createdAt)}</td>
+                      <td className="px-4">
                         <button
                           type="button"
-                          className="admin-action-btn delete"
+                          className="btn btn-sm btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-1"
                           onClick={() => handleDelete(review._id)}
                         >
-                          🗑️ Delete
+                          <span>🗑️</span> Delete
                         </button>
                       </td>
                     </tr>

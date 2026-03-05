@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminApi } from '../../api/admin';
 import { useAuth } from '../../contexts/AuthContext';
-import './admin.css';
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
@@ -34,69 +33,90 @@ export function AdminLoginPage() {
 
   return (
     <div
-      className="admin-login-wrapper d-flex align-items-center justify-content-center"
-      style={{ minHeight: '100vh', background: '#f8f9fa' }}
+      className="d-flex align-items-center justify-content-center bg-dark"
+      style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%)' 
+      }}
     >
       <div
-        className="card shadow-sm border-0"
-        style={{ maxWidth: '400px', width: '100%' }}
+        className="card shadow-lg border-0 rounded-4 overflow-hidden"
+        style={{ maxWidth: '420px', width: '90%' }}
       >
-        <div className="card-body p-4">
-          <div className="text-center mb-4">
-            <h2 className="fw-bold">Admin Panel</h2>
-            <p className="text-muted small">Sign in to manage FreelanceHub</p>
+        <div className="card-body p-4 p-md-5">
+          <div className="text-center mb-5">
+            <div 
+              className="bg-primary bg-gradient text-white rounded-4 d-inline-flex align-items-center justify-content-center mb-4 shadow-sm"
+              style={{ width: '64px', height: '64px', fontSize: '1.5rem', fontWeight: 'bold' }}
+            >
+              FH
+            </div>
+            <h2 className="fw-bold text-dark">Admin Portal</h2>
+            <p className="text-muted small">Enter your credentials to access the management dashboard</p>
           </div>
 
           {error && (
             <div
-              className="alert alert-danger py-2 px-3 small mb-3"
+              className="alert alert-danger border-0 rounded-3 py-2 px-3 small mb-4 d-flex align-items-center gap-2"
               role="alert"
             >
-              {error}
+              <span>⚠️</span> {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-3">
+            <div className="mb-4">
               <label
                 htmlFor="admin-email"
-                className="form-label small fw-semibold"
+                className="form-label small fw-bold text-muted text-uppercase tracking-wider"
+                style={{ fontSize: '0.7rem' }}
               >
                 Email Address
               </label>
-              <input
-                id="admin-email"
-                type="email"
-                className="form-control"
-                placeholder="admin@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoFocus
-              />
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  📧
+                </span>
+                <input
+                  id="admin-email"
+                  type="email"
+                  className="form-control bg-light border-start-0 ps-0"
+                  placeholder="admin@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </div>
             </div>
 
-            <div className="mb-4">
+            <div className="mb-5">
               <label
                 htmlFor="admin-password"
-                className="form-label small fw-semibold"
+                className="form-label small fw-bold text-muted text-uppercase tracking-wider"
+                style={{ fontSize: '0.7rem' }}
               >
                 Password
               </label>
-              <input
-                id="admin-password"
-                type="password"
-                className="form-control"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="input-group">
+                <span className="input-group-text bg-light border-end-0">
+                  🔒
+                </span>
+                <input
+                  id="admin-password"
+                  type="password"
+                  className="form-control bg-light border-start-0 ps-0"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
             <button
               type="submit"
-              className="btn btn-primary w-100 py-2 fw-bold"
+              className="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm"
               disabled={loading || !email || !password}
             >
               {loading ? (
@@ -109,10 +129,13 @@ export function AdminLoginPage() {
                   Signing in...
                 </>
               ) : (
-                'Sign In'
+                'Sign In to Dashboard'
               )}
             </button>
           </form>
+        </div>
+        <div className="card-footer bg-light border-0 py-3 text-center">
+          <span className="text-muted small">FreelanceHub Marketplace Admin</span>
         </div>
       </div>
     </div>

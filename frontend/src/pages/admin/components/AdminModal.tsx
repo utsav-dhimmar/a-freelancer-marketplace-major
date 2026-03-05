@@ -24,29 +24,48 @@ export function AdminModal({
   if (!isOpen) return null;
 
   return (
-    <div className="admin-modal-overlay" onClick={onClose}>
+    <div
+      className="modal fade show d-block"
+      tabIndex={-1}
+      style={{
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        backdropFilter: 'blur(4px)',
+      }}
+      onClick={onClose}
+    >
       <div
-        className={`admin-modal ${className}`}
-        onClick={(e) => e.stopPropagation()}
+        className={`modal-dialog modal-dialog-centered ${className}`}
         style={maxWidth ? { maxWidth } : undefined}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="admin-modal-header">
-          <h3>{title}</h3>
-          <button type="button" className="close-btn" onClick={onClose}>
-            ×
-          </button>
-        </div>
-        <div className="admin-modal-body">
-          {loading ? (
-            <div className="admin-loading" style={{ padding: '2rem 0' }}>
-              <div className="admin-spinner" />
-              <span>Loading...</span>
+        <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+          <div className="modal-header border-bottom px-4 py-3 bg-light">
+            <h5 className="modal-title fw-bold text-dark">{title}</h5>
+            <button
+              type="button"
+              className="btn-close"
+              aria-label="Close"
+              onClick={onClose}
+            ></button>
+          </div>
+          <div className="modal-body px-4 py-4">
+            {loading ? (
+              <div className="text-center py-5 text-muted">
+                <div className="spinner-border text-primary mb-3" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mb-0 fw-medium">Loading...</p>
+              </div>
+            ) : (
+              children
+            )}
+          </div>
+          {footer && (
+            <div className="modal-footer border-top px-4 py-3 bg-light">
+              {footer}
             </div>
-          ) : (
-            children
           )}
         </div>
-        {footer && <div className="admin-modal-footer">{footer}</div>}
       </div>
     </div>
   );

@@ -87,86 +87,114 @@ export function AdminJobsPage() {
     <AdminLayout title="Job Management">
       <AdminToast toasts={toasts} />
 
-      <div className="admin-table-card">
-        <div className="admin-table-header">
-          <h2>All Jobs ({total})</h2>
-          <div className="admin-table-filters">
-            <input
-              type="text"
-              placeholder="Search jobs..."
-              value={filters.search || ''}
-              onChange={(e) => {
-                setPage(1);
-                setFilters({
-                  ...filters,
-                  search: e.target.value || undefined,
-                });
-              }}
-            />
-            <select
-              value={filters.status || ''}
-              onChange={(e) => {
-                setPage(1);
-                setFilters({
-                  ...filters,
-                  status: (e.target.value ||
-                    undefined) as AdminJobFilters['status'],
-                });
-              }}
-            >
-              <option value="">All Statuses</option>
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+      <div className="card border-0 shadow-sm overflow-hidden">
+        <div className="card-header bg-white border-bottom py-3 px-4">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <h5 className="mb-0 fw-bold text-dark">All Jobs ({total})</h5>
+            <div className="d-flex flex-wrap gap-2">
+              <div
+                className="input-group input-group-sm"
+                style={{ maxWidth: '250px' }}
+              >
+                <span className="input-group-text bg-light border-end-0">
+                  🔍
+                </span>
+                <input
+                  type="text"
+                  className="form-control bg-light border-start-0 ps-0"
+                  placeholder="Search jobs..."
+                  value={filters.search || ''}
+                  onChange={(e) => {
+                    setPage(1);
+                    setFilters({
+                      ...filters,
+                      search: e.target.value || undefined,
+                    });
+                  }}
+                />
+              </div>
+              <select
+                className="form-select form-select-sm bg-light"
+                style={{ width: 'auto' }}
+                value={filters.status || ''}
+                onChange={(e) => {
+                  setPage(1);
+                  setFilters({
+                    ...filters,
+                    status: (e.target.value ||
+                      undefined) as AdminJobFilters['status'],
+                  });
+                }}
+              >
+                <option value="">All Statuses</option>
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {loading ? (
           <AdminLoading message="Loading jobs..." />
         ) : jobs.length === 0 ? (
-          <AdminEmpty icon="💼" message="No jobs found" />
+          <div className="p-4">
+            <AdminEmpty message="No jobs found" />
+          </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="admin-table">
-                <thead>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
                   <tr>
-                    <th>Title</th>
-                    <th>Client</th>
-                    <th>Budget</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Actions</th>
+                    <th className="text-uppercase small fw-bold text-muted px-4 py-3">
+                      Title
+                    </th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">
+                      Client
+                    </th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">
+                      Budget
+                    </th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">
+                      Status
+                    </th>
+                    <th className="text-uppercase small fw-bold text-muted py-3">
+                      Created
+                    </th>
+                    <th className="text-uppercase small fw-bold text-muted px-4 py-3">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {jobs.map((job) => (
                     <tr key={job._id}>
-                      <td>
-                        <strong>{job.title}</strong>
-                        <br />
-                        <small style={{ color: '#94a3b8' }}>
+                      <td className="px-4">
+                        <div className="fw-bold text-dark">{job.title}</div>
+                        <div className="small text-muted">
                           {job.skillsRequired?.slice(0, 3).join(', ')}
                           {job.skillsRequired?.length > 3 && '...'}
-                        </small>
+                        </div>
                       </td>
                       <td>{job.client?.username || '—'}</td>
-                      <td>{formatBudget(job)}</td>
+                      <td className="fw-medium text-dark">
+                        {formatBudget(job)}
+                      </td>
                       <td>
                         <AdminBadge variant={job.status}>
                           {job.status?.replace('_', ' ')}
                         </AdminBadge>
                       </td>
                       <td>{formatDate(job.createdAt)}</td>
-                      <td>
+                      <td className="px-4">
                         <button
                           type="button"
-                          className="admin-action-btn delete"
+                          className="btn btn-sm btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-1"
                           onClick={() => handleDelete(job._id)}
                         >
-                          🗑️ Delete
+                          <span>🗑️</span> Delete
                         </button>
                       </td>
                     </tr>

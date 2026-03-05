@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import '../admin.css';
 import { AdminSidebar } from './AdminSidebar';
 
 interface AdminLayoutProps {
@@ -13,14 +12,17 @@ export function AdminLayout({ title, children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="admin-wrapper">
+    <div className="d-flex min-vh-100 bg-light">
       <AdminSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="admin-content bg-light">
-        <header className="admin-topbar navbar bg-white border-bottom px-4 sticky-top">
+      <div className="flex-grow-1 d-flex flex-column min-vh-100 overflow-hidden">
+        <header
+          className="navbar bg-white border-bottom px-4 sticky-top shadow-sm"
+          style={{ height: '64px', zIndex: 1020 }}
+        >
           <div className="container-fluid d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center gap-3">
               <button
@@ -30,30 +32,36 @@ export function AdminLayout({ title, children }: AdminLayoutProps) {
               >
                 <span style={{ fontSize: '1.5rem' }}>☰</span>
               </button>
-              <h1 className="h5 fw-bold mb-0 text-dark">{title}</h1>
+              <h5 className="fw-bold mb-0 text-dark tracking-tight">{title}</h5>
             </div>
 
-            <div className="d-flex align-items-center gap-2">
+            <div className="d-flex align-items-center gap-3">
+              <div className="d-flex flex-column align-items-end d-none d-sm-flex">
+                <span className="small fw-bold text-dark">
+                  {user?.name || 'Admin'}
+                </span>
+                <span
+                  className="small text-muted"
+                  style={{ fontSize: '0.7rem' }}
+                >
+                  {user?.email}
+                </span>
+              </div>
               <div
-                className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                className="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm"
                 style={{
-                  width: '32px',
-                  height: '32px',
-                  fontSize: '0.8rem',
+                  width: '36px',
+                  height: '36px',
+                  fontSize: '0.9rem',
                 }}
               >
-                A
+                {user?.name?.charAt(0) || 'A'}
               </div>
-              <span className="small text-muted d-none d-sm-inline">
-                {user?.email || 'Admin'}
-              </span>
             </div>
           </div>
         </header>
 
-        <main className="admin-page-body container-fluid py-4 px-4">
-          {children}
-        </main>
+        <main className="container-fluid py-4 px-lg-5">{children}</main>
       </div>
     </div>
   );
