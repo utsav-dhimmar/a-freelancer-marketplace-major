@@ -32,8 +32,8 @@ export const proposalSchema = z.object({
   coverLetter: z
     .string()
     .min(50, 'Cover letter must be at least 50 characters'),
-  proposedAmount: z.number().min(1, 'Proposed amount must be at least 1'),
-  estimatedDuration: z.number().min(1, 'Duration must be at least 1 day'),
+  bidAmount: z.number().min(1, 'Bid amount must be at least 1'),
+  estimatedTime: z.string().min(1, 'Estimated time is required'),
 });
 
 export const freelancerSchema = z.object({

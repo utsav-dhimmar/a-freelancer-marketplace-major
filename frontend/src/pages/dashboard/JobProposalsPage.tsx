@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { proposalApi, jobApi } from '../../api';
 import { Card, Button } from '../../components/ui';
 import type { IProposal, IJob } from '../../types';
+import { formatCurrency } from '../../constants/currency';
 
 export function JobProposalsPage() {
   const { id } = useParams<{ id: string }>();
@@ -104,7 +105,7 @@ export function JobProposalsPage() {
       <div className="mb-4">
         <h2>Proposals for: {job.title}</h2>
         <div className="text-muted">
-          Budget: ${job.budget}
+          Budget: {formatCurrency(job.budget)}
           {job.budgetType === 'fixed' ? ' (Fixed Price)' : ' (Hourly)'}
         </div>
       </div>
@@ -124,8 +125,7 @@ export function JobProposalsPage() {
                   <div className="col-md-8">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h4 className="h5 mb-0">
-                        {/* Assuming API populates freelancer details if needed, otherwise just generic info */}
-                        Freelancer Proposal
+                        Proposal from {proposal.freelancer?.fullname || proposal.freelancer?.username || 'Freelancer'}
                       </h4>
                       <span
                         className={`badge bg-${getStatusBadgeVariant(proposal.status)}`}
@@ -134,10 +134,10 @@ export function JobProposalsPage() {
                       </span>
                     </div>
                     <div className="mb-3">
-                      <strong>Proposed Amount:</strong> $
-                      {proposal.proposedAmount} <br />
-                      <strong>Estimated Duration:</strong>{' '}
-                      {proposal.estimatedDuration} days
+                      <strong>Proposed Amount:</strong>{' '}
+                      {formatCurrency(proposal.bidAmount)} <br />
+                      <strong>Estimated Time:</strong>{' '}
+                      {proposal.estimatedTime}
                     </div>
                     <div>
                       <strong>Cover Letter:</strong>

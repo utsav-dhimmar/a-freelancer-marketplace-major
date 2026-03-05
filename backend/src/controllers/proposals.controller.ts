@@ -2,6 +2,7 @@ import type { NextFunction, Response } from 'express';
 import type { ObjectId } from 'mongoose';
 import { HTTP_STATUS } from '../constants/index.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
+import { contractService } from '../services/contracts.service.js';
 import { jobService } from '../services/job.service.js';
 import { proposalService } from '../services/proposals.service.js';
 import { ApiError, ApiResponse } from '../utils/ApiHelper.js';
@@ -284,9 +285,21 @@ export const updateProposalStatus = asyncHandler(
       status,
     );
 
-    // If accepted, update job status to in_progress
+    // If accepted, update job status and create contract
     if (status === 'accepted') {
-      await jobService.updateJobStatus(String(job._id), 'in_progress');
+      // Check if contract already exists to avoid duplicates
+      const exists = await contractService.contractExistsForProposal(id);
+      if (!exists) {
+        await jobService.updateJobStatus(String(job._id), 'in_progress');
+
+        await contractService.createContract({
+          job: String(job._id),
+          client: String(req.user._id),
+          freelancer: String(proposal.freelancer._id),
+          proposal: id,
+          amount: proposal.bidAmount,
+        });
+      }
     }
 
     res.status(HTTP_STATUS.OK).json(

@@ -65,10 +65,10 @@ export interface IPortfolioItem {
 export interface IProposal {
   _id: string;
   job: IJob;
-  freelancerId: string;
+  freelancer: IUser;
   coverLetter: string;
-  proposedAmount: number;
-  estimatedDuration: number;
+  bidAmount: number;
+  estimatedTime: string;
   status: ProposalStatus;
   createdAt: string;
   updatedAt: string;

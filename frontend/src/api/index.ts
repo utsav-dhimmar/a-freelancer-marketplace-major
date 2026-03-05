@@ -297,9 +297,7 @@ export const proposalApi = {
     job: string;
     coverLetter: string;
     bidAmount: number;
-    estimatedTime: number;
-
-    // job, coverLetter, bidAmount, estimatedTime
+    estimatedTime: string;
   }) => {
     const response = await api.post<ApiResponse<{ proposal: IProposal }>>(
       '/proposals',
@@ -355,10 +353,10 @@ export const proposalApi = {
 };
 
 export const contractApi = {
-  create: async (data: { jobId: string; proposalId: string }) => {
+  create: async (data: { proposalId: string }) => {
     const response = await api.post<ApiResponse<{ contract: IContract }>>(
       '/contracts',
-      data,
+      { proposal: data.proposalId },
     );
     return response.data.data.contract;
   },

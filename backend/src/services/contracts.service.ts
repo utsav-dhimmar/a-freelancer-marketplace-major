@@ -1,4 +1,6 @@
 import { Contract, type IContract } from '../model/contracts.model.js';
+import { Proposal } from '../model/proposals.model.js';
+import { Job } from '../model/job.model.js';
 import type { CreateContractData } from '../types/contract.types.js';
 
 export class ContractService {
@@ -130,6 +132,47 @@ export class ContractService {
   async contractExistsForProposal(proposalId: string): Promise<boolean> {
     const contract = await Contract.findOne({ proposal: proposalId });
     return contract !== null;
+  }
+
+  /**
+   * Automatically create contracts for all accepted proposals where the job is in_progress
+   */
+  async createContractsForAcceptedProposals(): Promise<{
+    created: number;
+    skipped: number;
+  }> {
+    const acceptedProposals = await Proposal.find({ status: 'accepted' });
+    let createdCount = 0;
+    let skippedCount = 0;
+
+    for (const proposal of acceptedProposals) {
+      const job = await Job.findById(proposal.job);
+
+      if (!job || job.status !== 'in_progress') {
+        skippedCount++;
+        continue;
+      }
+
+      const contractExists = await this.contractExistsForProposal(
+        String(proposal._id),
+      );
+      if (contractExists) {
+        skippedCount++;
+        continue;
+      }
+
+      await this.createContract({
+        job: String(job._id),
+        client: String(job.client),
+        freelancer: String(proposal.freelancer),
+        proposal: String(proposal._id),
+        amount: proposal.bidAmount,
+      });
+
+      createdCount++;
+    }
+
+    return { created: createdCount, skipped: skippedCount };
   }
 }
 

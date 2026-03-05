@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { freelancerApi } from '../../api';
 import { Card } from '../../components/ui';
 import type { IFreelancer } from '../../types';
+import { formatCurrency } from '../../constants/currency';
 
 export function FreelancerProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -99,7 +100,7 @@ export function FreelancerProfilePage() {
           <Card title="Contact">
             <div className="mb-3">
               <small className="text-muted">Hourly Rate</small>
-              <p className="mb-0 fw-bold fs-5">${freelancer.hourlyRate}/hr</p>
+              <p className="mb-0 fw-bold fs-5">{formatCurrency(freelancer.hourlyRate)}/hr</p>
             </div>
             <div className="mb-3">
               <small className="text-muted">Portfolio Items</small>

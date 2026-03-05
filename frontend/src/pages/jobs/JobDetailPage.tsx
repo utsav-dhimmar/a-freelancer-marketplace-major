@@ -4,6 +4,7 @@ import { jobApi, proposalApi } from '../../api';
 import { Button, Input, TextArea } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IJob, IProposal } from '../../types';
+import { CURRENCY, formatCurrency } from '../../constants/currency';
 
 const statusBadgeClasses: Record<string, string> = {
   open: 'bg-primary',
@@ -23,7 +24,7 @@ export function JobDetailPage() {
   const [proposalData, setProposalData] = useState({
     coverLetter: '',
     bidAmount: 0,
-    estimatedTime: 1,
+    estimatedTime: '1',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,7 +47,7 @@ export function JobDetailPage() {
     try {
       if (isAuthenticated && user?.role === 'freelancer') {
         const proposals = await proposalApi.getMyProposals();
-        const existingProposal = proposals.find((p) => p.jobId === id);
+        const existingProposal = proposals.find((p) => p.job._id === id);
         if (existingProposal) {
           setProposal(existingProposal);
         }
@@ -160,7 +161,7 @@ export function JobDetailPage() {
                   <div className="col-6">
                     <div className="text-muted small mb-1">Budget</div>
                     <p className="fw-semibold mb-0">
-                      ${job.budget}
+                      {formatCurrency(job.budget)}
                       <span className="text-muted small">
                         {job.budgetType === 'hourly' ? ' /hr' : ' fixed price'}
                       </span>
@@ -193,7 +194,7 @@ export function JobDetailPage() {
             <div className="card-body">
               <p className="text-muted small text-uppercase mb-1">Budget</p>
               <div className="d-flex flex-column gap-1">
-                <span className="fs-3 fw-bold text-primary">${job.budget}</span>
+                <span className="fs-3 fw-bold text-primary">{formatCurrency(job.budget)}</span>
                 <span className="text-muted">
                   {job.budgetType === 'hourly' ? 'Per hour' : 'Fixed price'}
                 </span>
@@ -237,13 +238,13 @@ export function JobDetailPage() {
                     <div className="row g-3">
                       <div className="col-6">
                         <Input
-                          label="Your Bid ($)"
+                          label={`Your Bid (${CURRENCY.symbol})`}
                           type="number"
-                          value={proposalData.proposedAmount}
+                          value={proposalData.bidAmount}
                           onChange={(event) =>
                             setProposalData((prev) => ({
                               ...prev,
-                              proposedAmount: Number(event.target.value),
+                              bidAmount: Number(event.target.value),
                             }))
                           }
                           min="1"
@@ -253,17 +254,16 @@ export function JobDetailPage() {
                       </div>
                       <div className="col-6">
                         <Input
-                          label="Duration (days)"
-                          type="number"
-                          value={proposalData.estimatedDuration}
+                          label="Duration (e.g. 5 days)"
+                          type="text"
+                          value={proposalData.estimatedTime}
                           onChange={(event) =>
                             setProposalData((prev) => ({
                               ...prev,
-                              estimatedDuration: Number(event.target.value),
+                              estimatedTime: event.target.value,
                             }))
                           }
-                          min="1"
-                          placeholder="1"
+                          placeholder="1 day"
                           required
                         />
                       </div>
@@ -309,13 +309,13 @@ export function JobDetailPage() {
                   <li className="list-group-item px-0 border-0 d-flex justify-content-between">
                     <span className="text-muted">Bid Amount</span>
                     <span className="fw-semibold">
-                      ${proposal.proposedAmount}
+                      {formatCurrency(proposal.bidAmount)}
                     </span>
                   </li>
                   <li className="list-group-item px-0 border-0 d-flex justify-content-between">
                     <span className="text-muted">Duration</span>
                     <span className="fw-semibold">
-                      {proposal.estimatedDuration} days
+                      {proposal.estimatedTime}
                     </span>
                   </li>
                 </ul>

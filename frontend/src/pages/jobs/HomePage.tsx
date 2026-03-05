@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { jobApi } from '../../api';
 import { Button } from '../../components/ui';
 import type { IJob } from '../../types';
+import { formatCurrency } from '../../constants/currency';
 
 const statusBadgeClasses: Record<string, string> = {
   open: 'bg-primary',
@@ -163,7 +164,7 @@ export function HomePage() {
                         <div className="d-flex align-items-center justify-content-between mt-auto gap-3">
                           <div>
                             <p className="mb-0 fw-semibold text-primary">
-                              ${job.budget}
+                              {formatCurrency(job.budget)}
                               <span className="small text-muted">
                                 {job.budgetType === 'hourly'
                                   ? ' /hr'

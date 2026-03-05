@@ -4,6 +4,7 @@ import { freelancerApi, authApi, STATIC_URL } from '../../api';
 import { Card, Button, Input, TextArea } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IFreelancer, IPortfolioItem } from '../../types';
+import { CURRENCY, formatCurrency } from '../../constants/currency';
 
 export function MyProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -217,7 +218,7 @@ export function MyProfilePage() {
                   </div>
                 </div>
                 <Input
-                  label="Hourly Rate ($)"
+                  label={`Hourly Rate (${CURRENCY.symbol})`}
                   type="number"
                   value={formData.hourlyRate}
                   onChange={(e) =>
@@ -389,7 +390,7 @@ export function MyProfilePage() {
             <div className="mb-3">
               <small className="text-muted">Hourly Rate</small>
               <p className="mb-0 fw-bold fs-5">
-                ${freelancer?.hourlyRate || formData.hourlyRate || 0}/hr
+                {formatCurrency(freelancer?.hourlyRate || formData.hourlyRate || 0)}/hr
               </p>
             </div>
             <div className="mb-3">
