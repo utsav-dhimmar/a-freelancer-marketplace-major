@@ -100,7 +100,7 @@ export const getAllJobs = asyncHandler(
 
 		const result = await jobService.getAllJobs(page, limit, status);
 
-		if (!result.jobs || result.jobs.length == 0) {
+		if (!result.jobs || result.jobs.length === 0) {
 			throw new ApiError(HTTP_STATUS.NOT_FOUND, "Jobs not found");
 		}
 		res.status(HTTP_STATUS.OK).json(

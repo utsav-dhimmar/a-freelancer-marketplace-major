@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant:
+  variant?:
     | 'primary'
     | 'secondary'
     | 'outline'
@@ -25,7 +25,7 @@ export const Button = ({
   ref,
   ...props
 }: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) => {
-  const variantMap: Record<ButtonProps['variant'], string> = {
+  const variantMap: Record<string, string> = {
     primary: 'btn-primary',
     secondary: 'btn-secondary',
     outline: 'btn-outline-secondary',
@@ -37,7 +37,7 @@ export const Button = ({
     success: 'btn-success',
   };
   const sizeClass = size === 'md' ? '' : `btn-${size}`;
-  const variantClass = variantMap[variant] ?? variantMap.primary;
+  const variantClass = variantMap[variant || 'primary'] ?? variantMap.primary;
 
   return (
     <button

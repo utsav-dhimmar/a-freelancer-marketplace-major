@@ -95,7 +95,7 @@ export function AdminUsersPage() {
     if (!editUser) return;
     setSaving(true);
     try {
-      await adminApi.updateUser(editUser._id, editForm);
+      await adminApi.updateUser(editUser._id!, editForm);
       setEditUser(null);
       showToast("User updated successfully", "success");
       fetchUsers();
@@ -194,7 +194,7 @@ export function AdminUsersPage() {
                           <button
                             type="button"
                             className="admin-action-btn view"
-                            onClick={() => handleView(user._id)}
+                            onClick={() => handleView(user._id!)}
                           >
                             View
                           </button>
@@ -208,7 +208,7 @@ export function AdminUsersPage() {
                           <button
                             type="button"
                             className="admin-action-btn delete"
-                            onClick={() => handleDelete(user._id)}
+                            onClick={() => handleDelete(user._id!)}
                           >
                             Delete
                           </button>
