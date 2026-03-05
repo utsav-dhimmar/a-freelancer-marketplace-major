@@ -9,14 +9,7 @@ const footerColumns = [
       { label: 'Post a Project', to: '/jobs/create' },
     ],
   },
-  {
-    title: 'Company',
-    items: [
-      { label: 'About Us', to: '/about' },
-      { label: 'Careers', to: '/careers' },
-      { label: 'Press', to: '/press' },
-    ],
-  },
+
   {
     title: 'Support',
     items: [
@@ -71,17 +64,6 @@ export function Footer() {
           <small className="text-muted">
             &copy; 2026 FreelanceHub. All rights reserved.
           </small>
-          <div className="d-flex gap-3">
-            <a className="text-muted text-decoration-none" href="#">
-              Twitter
-            </a>
-            <a className="text-muted text-decoration-none" href="#">
-              LinkedIn
-            </a>
-            <a className="text-muted text-decoration-none" href="#">
-              GitHub
-            </a>
-          </div>
         </div>
       </div>
     </footer>

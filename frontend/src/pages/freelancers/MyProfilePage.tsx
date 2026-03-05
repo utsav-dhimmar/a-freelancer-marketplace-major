@@ -390,7 +390,10 @@ export function MyProfilePage() {
             <div className="mb-3">
               <small className="text-muted">Hourly Rate</small>
               <p className="mb-0 fw-bold fs-5">
-                {formatCurrency(freelancer?.hourlyRate || formData.hourlyRate || 0)}/hr
+                {formatCurrency(
+                  freelancer?.hourlyRate || formData.hourlyRate || 0,
+                )}
+                /hr
               </p>
             </div>
             <div className="mb-3">

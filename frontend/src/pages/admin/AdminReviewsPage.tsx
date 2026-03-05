@@ -1,5 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { AdminLayout } from './components/AdminLayout';
+import {
+  AdminLayout,
+  AdminPagination,
+  AdminToast,
+  AdminLoading,
+  AdminEmpty,
+} from './components';
+import type { Toast } from './components';
 import { adminApi } from '../../api/admin';
 import type { IAdminReview } from '../../types/admin';
 
@@ -13,12 +20,6 @@ function Stars({ rating }: { rating: number }) {
       ))}
     </span>
   );
-}
-
-interface Toast {
-  id: number;
-  message: string;
-  type: 'success' | 'error';
 }
 
 let toastId = 0;
@@ -84,16 +85,7 @@ export function AdminReviewsPage() {
 
   return (
     <AdminLayout title="Review Management">
-      {/* Toast Notifications */}
-      {toasts.length > 0 && (
-        <div className="admin-toast-container">
-          {toasts.map((t) => (
-            <div key={t.id} className={`admin-toast ${t.type}`}>
-              {t.type === 'success' ? '✅' : '❌'} {t.message}
-            </div>
-          ))}
-        </div>
-      )}
+      <AdminToast toasts={toasts} />
 
       <div className="admin-table-card">
         <div className="admin-table-header">
@@ -101,15 +93,9 @@ export function AdminReviewsPage() {
         </div>
 
         {loading ? (
-          <div className="admin-loading">
-            <div className="admin-spinner" />
-            <span>Loading reviews...</span>
-          </div>
+          <AdminLoading message="Loading reviews..." />
         ) : reviews.length === 0 ? (
-          <div className="admin-empty">
-            <div className="empty-icon">⭐</div>
-            <p>No reviews found</p>
-          </div>
+          <AdminEmpty icon="⭐" message="No reviews found" />
         ) : (
           <>
             <div style={{ overflowX: 'auto' }}>
@@ -173,27 +159,13 @@ export function AdminReviewsPage() {
               </table>
             </div>
 
-            <div className="admin-pagination">
-              <span className="pagination-info">
-                Page {page} of {totalPages} · {total} reviews
-              </span>
-              <div className="pagination-buttons">
-                <button
-                  type="button"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
+            <AdminPagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              onPageChange={setPage}
+              label="reviews"
+            />
           </>
         )}
       </div>

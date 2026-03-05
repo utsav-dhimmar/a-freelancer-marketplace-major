@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AdminSidebar } from './AdminSidebar';
 import '../admin.css';
+import { AdminSidebar } from './AdminSidebar';
 
 interface AdminLayoutProps {
   title: string;
@@ -32,9 +32,16 @@ export function AdminLayout({ title, children }: AdminLayoutProps) {
               </button>
               <h1 className="h5 fw-bold mb-0 text-dark">{title}</h1>
             </div>
-            
+
             <div className="d-flex align-items-center gap-2">
-              <div className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style={{ width: '32px', height: '32px', fontSize: '0.8rem' }}>
+              <div
+                className="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  fontSize: '0.8rem',
+                }}
+              >
                 A
               </div>
               <span className="small text-muted d-none d-sm-inline">

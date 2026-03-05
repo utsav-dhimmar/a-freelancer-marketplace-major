@@ -1,5 +1,5 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../contexts/AuthContext";
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface NavLinkItem {
   to: string;
@@ -15,16 +15,16 @@ interface NavSection {
 
 const NAV_ITEMS: NavSection[] = [
   {
-    section: "Main",
-    links: [{ to: "/admin", label: "Dashboard", end: true }],
+    section: 'Main',
+    links: [{ to: '/admin', label: 'Dashboard', end: true }],
   },
   {
-    section: "Management",
+    section: 'Management',
     links: [
-      { to: "/admin/users", label: "Users" },
-      { to: "/admin/jobs", label: "Jobs" },
-      { to: "/admin/contracts", label: "Contracts" },
-      { to: "/admin/reviews", label: "Reviews" },
+      { to: '/admin/users', label: 'Users' },
+      { to: '/admin/jobs', label: 'Jobs' },
+      { to: '/admin/contracts', label: 'Contracts' },
+      { to: '/admin/reviews', label: 'Reviews' },
     ],
   },
 ];
@@ -40,7 +40,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/admin/login");
+    navigate('/admin/login');
   };
 
   return (
@@ -51,7 +51,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           onClick={onClose}
           style={{
             zIndex: 1035,
-            display: "block", // Added display: block when isOpen is true
+            display: 'block', // Added display: block when isOpen is true
             top: 0,
             left: 0,
             right: 0,
@@ -60,7 +60,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         />
       )}
       <aside
-        className={`admin-sidebar bg-dark text-light ${isOpen ? "open" : ""}`}
+        className={`admin-sidebar bg-dark text-light ${isOpen ? 'open' : ''}`}
       >
         <div className="admin-sidebar-brand border-bottom border-secondary border-opacity-25 px-4 py-3">
           <div className="d-flex align-items-center gap-3">
@@ -76,7 +76,10 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <div className="mb-4 px-3" key={section.section}>
               <p
                 className="small text-muted text-uppercase fw-bold mb-2 ps-2"
-                style={{ letterSpacing: "1px", fontSize: "0.7rem" }}
+                style={{
+                  letterSpacing: '1px',
+                  fontSize: '0.7rem',
+                }}
               >
                 {section.section}
               </p>
@@ -89,8 +92,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                       className={({ isActive }) =>
                         `nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 transition-all ${
                           isActive
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-light opacity-75"
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'text-light opacity-75'
                         }`
                       }
                       onClick={onClose}

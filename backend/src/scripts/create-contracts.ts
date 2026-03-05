@@ -8,7 +8,8 @@ const runScript = async () => {
     console.log('[SCRIPT] Starting contract creation process...');
 
     // 2. Call the service method
-    const { created, skipped } = await contractService.createContractsForAcceptedProposals();
+    const { created, skipped } =
+      await contractService.createContractsForAcceptedProposals();
 
     console.log(`[SCRIPT] Finished! Created: ${created}, Skipped: ${skipped}.`);
   } catch (error) {

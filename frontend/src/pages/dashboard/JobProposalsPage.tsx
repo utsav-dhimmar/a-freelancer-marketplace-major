@@ -125,7 +125,10 @@ export function JobProposalsPage() {
                   <div className="col-md-8">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h4 className="h5 mb-0">
-                        Proposal from {proposal.freelancer?.fullname || proposal.freelancer?.username || 'Freelancer'}
+                        Proposal from{' '}
+                        {proposal.freelancer?.fullname ||
+                          proposal.freelancer?.username ||
+                          'Freelancer'}
                       </h4>
                       <span
                         className={`badge bg-${getStatusBadgeVariant(proposal.status)}`}
@@ -136,8 +139,7 @@ export function JobProposalsPage() {
                     <div className="mb-3">
                       <strong>Proposed Amount:</strong>{' '}
                       {formatCurrency(proposal.bidAmount)} <br />
-                      <strong>Estimated Time:</strong>{' '}
-                      {proposal.estimatedTime}
+                      <strong>Estimated Time:</strong> {proposal.estimatedTime}
                     </div>
                     <div>
                       <strong>Cover Letter:</strong>

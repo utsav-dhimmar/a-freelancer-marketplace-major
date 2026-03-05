@@ -12,7 +12,7 @@ export function AdminLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -37,7 +37,10 @@ export function AdminLoginPage() {
       className="admin-login-wrapper d-flex align-items-center justify-content-center"
       style={{ minHeight: '100vh', background: '#f8f9fa' }}
     >
-      <div className="card shadow-sm border-0" style={{ maxWidth: '400px', width: '100%' }}>
+      <div
+        className="card shadow-sm border-0"
+        style={{ maxWidth: '400px', width: '100%' }}
+      >
         <div className="card-body p-4">
           <div className="text-center mb-4">
             <h2 className="fw-bold">Admin Panel</h2>
@@ -45,14 +48,20 @@ export function AdminLoginPage() {
           </div>
 
           {error && (
-            <div className="alert alert-danger py-2 px-3 small mb-3" role="alert">
+            <div
+              className="alert alert-danger py-2 px-3 small mb-3"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="admin-email" className="form-label small fw-semibold">
+              <label
+                htmlFor="admin-email"
+                className="form-label small fw-semibold"
+              >
                 Email Address
               </label>
               <input
@@ -68,7 +77,10 @@ export function AdminLoginPage() {
             </div>
 
             <div className="mb-4">
-              <label htmlFor="admin-password" className="form-label small fw-semibold">
+              <label
+                htmlFor="admin-password"
+                className="form-label small fw-semibold"
+              >
                 Password
               </label>
               <input

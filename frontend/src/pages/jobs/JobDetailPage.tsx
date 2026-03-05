@@ -194,7 +194,9 @@ export function JobDetailPage() {
             <div className="card-body">
               <p className="text-muted small text-uppercase mb-1">Budget</p>
               <div className="d-flex flex-column gap-1">
-                <span className="fs-3 fw-bold text-primary">{formatCurrency(job.budget)}</span>
+                <span className="fs-3 fw-bold text-primary">
+                  {formatCurrency(job.budget)}
+                </span>
                 <span className="text-muted">
                   {job.budgetType === 'hourly' ? 'Per hour' : 'Fixed price'}
                 </span>

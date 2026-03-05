@@ -1,37 +1,37 @@
-import { useEffect, useState } from "react";
-import { AdminLayout } from "./components/AdminLayout";
-import { adminApi } from "../../api/admin";
-import type { DashboardStats } from "../../types/admin";
+import { useEffect, useState } from 'react';
+import { AdminLayout } from './components/AdminLayout';
+import { adminApi } from '../../api/admin';
+import type { DashboardStats } from '../../types/admin';
 
 const STAT_CARDS = [
   {
-    key: "users" as const,
-    label: "Total Users",
-    color: "primary",
-    breakdownKeys: ["clients", "freelancers", "admins"] as const,
+    key: 'users' as const,
+    label: 'Total Users',
+    color: 'primary',
+    breakdownKeys: ['clients', 'freelancers', 'admins'] as const,
   },
   {
-    key: "jobs" as const,
-    label: "Total Jobs",
-    color: "info",
-    breakdownKeys: ["open", "inProgress", "completed", "cancelled"] as const,
+    key: 'jobs' as const,
+    label: 'Total Jobs',
+    color: 'info',
+    breakdownKeys: ['open', 'inProgress', 'completed', 'cancelled'] as const,
   },
   {
-    key: "contracts" as const,
-    label: "Total Contracts",
-    color: "success",
-    breakdownKeys: ["active", "submitted", "completed", "disputed"] as const,
+    key: 'contracts' as const,
+    label: 'Total Contracts',
+    color: 'success',
+    breakdownKeys: ['active', 'submitted', 'completed', 'disputed'] as const,
   },
   {
-    key: "proposals" as const,
-    label: "Total Proposals",
-    color: "warning",
-    breakdownKeys: ["pending", "accepted", "rejected"] as const,
+    key: 'proposals' as const,
+    label: 'Total Proposals',
+    color: 'warning',
+    breakdownKeys: ['pending', 'accepted', 'rejected'] as const,
   },
   {
-    key: "reviews" as const,
-    label: "Total Reviews",
-    color: "danger",
+    key: 'reviews' as const,
+    label: 'Total Reviews',
+    color: 'danger',
     breakdownKeys: [] as const,
   },
 ];
@@ -46,7 +46,7 @@ export function AdminDashboardPage() {
         const data = await adminApi.getDashboardStats();
         setStats(data);
       } catch (err) {
-        console.error("Failed to load stats:", err);
+        console.error('Failed to load stats:', err);
       } finally {
         setLoading(false);
       }
@@ -104,7 +104,7 @@ export function AdminDashboardPage() {
                     <div className="pt-3 border-top d-flex flex-wrap gap-3">
                       {card.breakdownKeys.map((bk) => (
                         <div key={bk} className="small text-muted">
-                          <span className="text-capitalize">{bk}:</span>{" "}
+                          <span className="text-capitalize">{bk}:</span>{' '}
                           <span className="fw-bold text-dark">
                             {(section as Record<string, number>)[bk]}
                           </span>
