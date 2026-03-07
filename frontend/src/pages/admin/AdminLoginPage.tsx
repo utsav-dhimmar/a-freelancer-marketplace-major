@@ -34,9 +34,9 @@ export function AdminLoginPage() {
   return (
     <div
       className="d-flex align-items-center justify-content-center bg-dark"
-      style={{ 
-        minHeight: '100vh', 
-        background: 'linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%)' 
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%)',
       }}
     >
       <div
@@ -45,14 +45,21 @@ export function AdminLoginPage() {
       >
         <div className="card-body p-4 p-md-5">
           <div className="text-center mb-5">
-            <div 
+            <div
               className="bg-primary bg-gradient text-white rounded-4 d-inline-flex align-items-center justify-content-center mb-4 shadow-sm"
-              style={{ width: '64px', height: '64px', fontSize: '1.5rem', fontWeight: 'bold' }}
+              style={{
+                width: '64px',
+                height: '64px',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+              }}
             >
               FH
             </div>
             <h2 className="fw-bold text-dark">Admin Portal</h2>
-            <p className="text-muted small">Enter your credentials to access the management dashboard</p>
+            <p className="text-muted small">
+              Enter your credentials to access the management dashboard
+            </p>
           </div>
 
           {error && (
@@ -135,7 +142,9 @@ export function AdminLoginPage() {
           </form>
         </div>
         <div className="card-footer bg-light border-0 py-3 text-center">
-          <span className="text-muted small">FreelanceHub Marketplace Admin</span>
+          <span className="text-muted small">
+            FreelanceHub Marketplace Admin
+          </span>
         </div>
       </div>
     </div>

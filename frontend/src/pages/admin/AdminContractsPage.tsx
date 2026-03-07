@@ -108,7 +108,9 @@ export function AdminContractsPage() {
         <div className="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
           <h5 className="mb-0 fw-bold text-dark">All Contracts ({total})</h5>
           <div className="d-flex align-items-center gap-2">
-            <span className="small text-muted fw-medium d-none d-sm-inline">Filter:</span>
+            <span className="small text-muted fw-medium d-none d-sm-inline">
+              Filter:
+            </span>
             <select
               className="form-select form-select-sm bg-light"
               style={{ width: 'auto' }}
@@ -144,7 +146,12 @@ export function AdminContractsPage() {
                 <thead className="table-light">
                   <tr>
                     {TABLE_HEADINGS.map((heading) => (
-                      <th key={heading} className="text-uppercase small fw-bold text-muted px-4 py-3">{heading}</th>
+                      <th
+                        key={heading}
+                        className="text-uppercase small fw-bold text-muted px-4 py-3"
+                      >
+                        {heading}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -152,14 +159,14 @@ export function AdminContractsPage() {
                   {contracts.map((c) => (
                     <tr key={c._id}>
                       <td className="px-4">
-                        <div className="fw-bold text-dark">{c.job?.title || '—'}</div>
+                        <div className="fw-bold text-dark">
+                          {c.job?.title || '—'}
+                        </div>
                       </td>
                       <td>{c.client?.username || '—'}</td>
                       <td>{c.freelancer?.username || '—'}</td>
                       <td className="fw-medium text-dark">
-                        {formatCurrency(
-                          c.amount as unknown as number,
-                        ) || '0'}
+                        {formatCurrency(c.amount as unknown as number) || '0'}
                       </td>
                       <td>
                         <AdminBadge variant={c.status}>{c.status}</AdminBadge>
