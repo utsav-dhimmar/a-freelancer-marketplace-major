@@ -10,7 +10,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | 'outline-danger'
     | 'ghost'
     | 'danger'
-    | 'success';
+    | 'success'
+    | 'warning';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }

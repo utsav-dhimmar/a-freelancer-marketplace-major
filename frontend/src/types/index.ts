@@ -88,3 +88,15 @@ export interface IContract {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface IReview {
+  _id: string;
+  reviewer: IUser;
+  reviewee: IUser;
+  contract: string;
+  targetRole: 'client' | 'freelancer';
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+}

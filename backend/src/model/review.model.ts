@@ -6,6 +6,7 @@ import { Document, Model, Schema, Types, model } from 'mongoose';
 export interface IReview extends Document {
   reviewer: Types.ObjectId;
   reviewee: Types.ObjectId;
+  contract: Types.ObjectId;
   targetRole: 'client' | 'freelancer';
   rating: number;
   comment: string;
@@ -27,6 +28,11 @@ const reviewSchema = new Schema<IReview>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Reviewee is required'],
+    },
+    contract: {
+      type: Schema.Types.ObjectId,
+      ref: 'Contract',
+      required: [true, 'Contract is required'],
     },
     targetRole: {
       type: String,
@@ -50,11 +56,8 @@ const reviewSchema = new Schema<IReview>(
   },
 );
 
-// Ensure a user can only review another user once per role
-reviewSchema.index(
-  { reviewer: 1, reviewee: 1, targetRole: 1 },
-  { unique: true },
-);
+// Ensure a user can only review the other party once per contract
+reviewSchema.index({ reviewer: 1, reviewee: 1, contract: 1 }, { unique: true });
 
 /**
  * Review model

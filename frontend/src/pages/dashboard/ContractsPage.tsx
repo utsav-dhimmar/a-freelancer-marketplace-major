@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { contractApi, jobApi } from '../../api';
+import { contractApi, jobApi, reviewApi } from '../../api';
 import {
   Button,
   Card,
@@ -26,6 +26,15 @@ export function ContractsPage() {
   const [disputeReason, setDisputeReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Review state
+  const [reviewContract, setReviewContract] = useState<IContract | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewedContracts, setReviewedContracts] = useState<Set<string>>(
+    new Set(),
+  );
+
   useEffect(() => {
     loadContracts();
   }, []);
@@ -47,6 +56,19 @@ export function ContractsPage() {
         } catch {}
       }
       setJobs(jobData);
+
+      // Check which completed contracts have already been reviewed
+      const completedContracts = data.filter(
+        (c: IContract) => c.status === 'completed',
+      );
+      const reviewed = new Set<string>();
+      for (const c of completedContracts) {
+        try {
+          const hasReviewed = await reviewApi.checkReviewed(c._id);
+          if (hasReviewed) reviewed.add(c._id);
+        } catch {}
+      }
+      setReviewedContracts(reviewed);
     } catch (error) {
       console.error('Failed to load contracts:', error);
     } finally {
@@ -99,6 +121,29 @@ export function ContractsPage() {
     }
   };
 
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewContract) return;
+
+    setReviewSubmitting(true);
+    try {
+      await reviewApi.create({
+        contractId: reviewContract._id,
+        rating: reviewRating,
+        comment: reviewComment || undefined,
+      });
+      setReviewedContracts((prev) => new Set(prev).add(reviewContract._id));
+      setReviewContract(null);
+      setReviewRating(5);
+      setReviewComment('');
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || 'Failed to submit review';
+      alert(msg);
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
@@ -110,6 +155,32 @@ export function ContractsPage() {
     };
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
   };
+
+  /** Star rating picker component */
+  const StarRating = ({
+    value,
+    onChange,
+  }: {
+    value: number;
+    onChange: (v: number) => void;
+  }) => (
+    <div style={{ display: 'flex', gap: 4, cursor: 'pointer', fontSize: 28 }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          onClick={() => onChange(star)}
+          style={{
+            color: star <= value ? '#f59e0b' : '#d1d5db',
+            transition: 'color 0.15s',
+          }}
+          role="button"
+          aria-label={`${star} star${star > 1 ? 's' : ''}`}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
 
   if (loading) {
     return (
@@ -184,7 +255,31 @@ export function ContractsPage() {
                     </>
                   )}
                   {contract.status === 'completed' && (
-                    <span className="text-success">Contract completed</span>
+                    <>
+                      <span className="text-success">
+                        ✅ Contract completed
+                      </span>
+                      {!reviewedContracts.has(contract._id) ? (
+                        <Button
+                          size="sm"
+                          variant="warning"
+                          onClick={() => {
+                            setReviewContract(contract);
+                            setReviewRating(5);
+                            setReviewComment('');
+                          }}
+                        >
+                          ⭐ Leave Review
+                        </Button>
+                      ) : (
+                        <span
+                          className="text-muted small"
+                          style={{ alignSelf: 'center' }}
+                        >
+                          ✓ Reviewed
+                        </span>
+                      )}
+                    </>
                   )}
                   {contract.status === 'disputed' && (
                     <span className="text-danger">Under dispute</span>
@@ -196,6 +291,7 @@ export function ContractsPage() {
         </div>
       )}
 
+      {/* Submit Work / Dispute Modal */}
       {selectedContract && (
         <div
           className="modal d-block"
@@ -259,6 +355,55 @@ export function ContractsPage() {
                     </div>
                   </form>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {reviewContract && (
+        <div
+          className="modal d-block"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">⭐ Leave a Review</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setReviewContract(null)}
+                />
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleSubmitReview}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Rating</label>
+                    <StarRating
+                      value={reviewRating}
+                      onChange={setReviewRating}
+                    />
+                  </div>
+                  <TextArea
+                    label="Comment (optional)"
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    rows={3}
+                  />
+                  <div className="d-flex gap-2 mt-2">
+                    <Button type="submit" isLoading={reviewSubmitting}>
+                      Submit Review
+                    </Button>
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setReviewContract(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ import type {
   IJob,
   IPortfolioItem,
   IProposal,
+  IReview,
   IUser,
   ApiResponse,
 } from '../types';
@@ -399,6 +400,41 @@ export const contractApi = {
       },
     );
     return response.data.data.contract;
+  },
+};
+
+export const reviewApi = {
+  create: async (data: {
+    contractId: string;
+    rating: number;
+    comment?: string;
+  }) => {
+    const response = await api.post<ApiResponse<{ review: IReview }>>(
+      '/reviews',
+      data,
+    );
+    return response.data.data.review;
+  },
+
+  getByContract: async (contractId: string) => {
+    const response = await api.get<ApiResponse<{ reviews: IReview[] }>>(
+      `/reviews/contract/${contractId}`,
+    );
+    return response.data.data.reviews;
+  },
+
+  getByUser: async (userId: string) => {
+    const response = await api.get<ApiResponse<{ reviews: IReview[] }>>(
+      `/reviews/user/${userId}`,
+    );
+    return response.data.data.reviews;
+  },
+
+  checkReviewed: async (contractId: string) => {
+    const response = await api.get<ApiResponse<{ hasReviewed: boolean }>>(
+      `/reviews/check/${contractId}`,
+    );
+    return response.data.data.hasReviewed;
   },
 };
 
