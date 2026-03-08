@@ -31,7 +31,7 @@ export interface IAuthResponse {
 
 export interface IJob {
   _id: string;
-  client: string;
+  client: string | { _id: string };
   title: string;
   description: string;
   skillsRequired: string[];

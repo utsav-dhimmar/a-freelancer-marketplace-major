@@ -30,10 +30,6 @@ const NAV_AUTHNICATED_LINK = [
     link: '/dashboard',
   },
   {
-    lable: 'Proposals',
-    link: '/dashboard/proposals',
-  },
-  {
     lable: 'Contracts',
     link: '/dashboard/contracts',
   },
@@ -91,6 +87,23 @@ export function Navbar() {
                     {lable}
                   </Link>
                 ))}
+                {user?.role === 'client' ? (
+                  <Link
+                    to="/dashboard/jobs"
+                    className="nav-link px-3 fw-medium text-dark"
+                    onClick={handleCollapse}
+                  >
+                    Jobs
+                  </Link>
+                ) : (
+                  <Link
+                    to="/dashboard/proposals"
+                    className="nav-link px-3 fw-medium text-dark"
+                    onClick={handleCollapse}
+                  >
+                    Proposals
+                  </Link>
+                )}
 
                 {user?.role === 'freelancer' && (
                   <Link
