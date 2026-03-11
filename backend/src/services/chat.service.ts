@@ -1,4 +1,5 @@
-import { db } from '../config/firebase.config.js';
+import { Types } from 'mongoose';
+import { Message } from '../model/message.model.js';
 
 /**
  * Interface for a chat message
@@ -25,13 +26,6 @@ export interface IChatInfo {
 
 export class ChatService {
   /**
-   * Get the messages sub-collection reference for a contract
-   */
-  private getMessagesRef(contractId: string) {
-    return db.collection('chats').doc(contractId).collection('messages');
-  }
-
-  /**
    * Send a message in a contract chat
    */
   async sendMessage(
@@ -40,26 +34,21 @@ export class ChatService {
     senderName: string,
     message: string,
   ): Promise<IChatMessage> {
-    const messagesRef = this.getMessagesRef(contractId);
-
-    const docRef = await messagesRef.add({
-      senderId,
+    const newMessage = await Message.create({
+      contractId: new Types.ObjectId(contractId),
+      senderId: new Types.ObjectId(senderId),
       senderName,
       message,
-      timestamp: new Date(),
-      readBy: [senderId],
+      readBy: [new Types.ObjectId(senderId)],
     });
 
-    const doc = await docRef.get();
-    const data = doc.data()!;
-
     return {
-      id: doc.id,
-      senderId: data.senderId,
-      senderName: data.senderName,
-      message: data.message,
-      timestamp: data.timestamp.toDate(),
-      readBy: Array.isArray(data.readBy) ? data.readBy : [],
+      id: newMessage._id.toString(),
+      senderId: newMessage.senderId.toString(),
+      senderName: newMessage.senderName,
+      message: newMessage.message,
+      timestamp: newMessage.createdAt,
+      readBy: newMessage.readBy.map((id) => id.toString()),
     };
   }
 
@@ -76,37 +65,31 @@ export class ChatService {
     page: number;
     totalPages: number;
   }> {
-    const messagesRef = this.getMessagesRef(contractId);
+    const skip = (page - 1) * limit;
+    const contractObjectId = new Types.ObjectId(contractId);
 
-    // Get total count
-    const countSnapshot = await messagesRef.count().get();
-    const total = countSnapshot.data().count;
+    const [messages, total] = await Promise.all([
+      Message.find({ contractId: contractObjectId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Message.countDocuments({ contractId: contractObjectId }),
+    ]);
+
     const totalPages = Math.ceil(total / limit);
 
-    // Calculate offset for pagination
-    const offset = (page - 1) * limit;
-
-    // Get paginated messages (newest first)
-    const snapshot = await messagesRef
-      .orderBy('timestamp', 'desc')
-      .offset(offset)
-      .limit(limit)
-      .get();
-
-    const messages: IChatMessage[] = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        senderId: data.senderId,
-        senderName: data.senderName,
-        message: data.message,
-        timestamp: data.timestamp.toDate(),
-        readBy: Array.isArray(data.readBy) ? data.readBy : [],
-      };
-    });
+    const formattedMessages: IChatMessage[] = messages.map((m: any) => ({
+      id: m._id.toString(),
+      senderId: m.senderId.toString(),
+      senderName: m.senderName,
+      message: m.message,
+      timestamp: m.createdAt,
+      readBy: m.readBy.map((id: any) => id.toString()),
+    }));
 
     return {
-      messages,
+      messages: formattedMessages,
       total,
       page,
       totalPages,
@@ -117,36 +100,24 @@ export class ChatService {
    * Get chat info/metadata for a contract
    */
   async getChatInfo(contractId: string): Promise<IChatInfo> {
-    const messagesRef = this.getMessagesRef(contractId);
+    const contractObjectId = new Types.ObjectId(contractId);
 
-    // Get total count
-    const countSnapshot = await messagesRef.count().get();
-    const totalMessages = countSnapshot.data().count;
+    const totalMessages = await Message.countDocuments({
+      contractId: contractObjectId,
+    });
 
-    // Get the latest message
-    const latestSnapshot = await messagesRef
-      .orderBy('timestamp', 'desc')
-      .limit(1)
-      .get();
-
-    let lastMessageAt: Date | null = null;
-    let lastMessage: string | null = null;
-    let lastSenderName: string | null = null;
-
-    const latestDoc = latestSnapshot.docs[0];
-    if (latestDoc) {
-      const data = latestDoc.data();
-      lastMessageAt = data.timestamp.toDate();
-      lastMessage = data.message;
-      lastSenderName = data.senderName;
-    }
+    const latestMessage = await Message.findOne({
+      contractId: contractObjectId,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
     return {
       contractId,
       totalMessages,
-      lastMessageAt,
-      lastMessage,
-      lastSenderName,
+      lastMessageAt: latestMessage ? latestMessage.createdAt : null,
+      lastMessage: latestMessage ? latestMessage.message : null,
+      lastSenderName: latestMessage ? latestMessage.senderName : null,
     };
   }
 
@@ -158,53 +129,55 @@ export class ChatService {
     readerId: string,
     messageIds?: string[],
   ): Promise<string[]> {
-    const messagesRef = this.getMessagesRef(contractId);
-    const updatedMessageIds: string[] = [];
+    const readerObjectId = new Types.ObjectId(readerId);
+    const contractObjectId = new Types.ObjectId(contractId);
 
     if (messageIds && messageIds.length > 0) {
-      const uniqueIds = Array.from(new Set(messageIds));
-      for (const messageId of uniqueIds) {
-        const docRef = messagesRef.doc(messageId);
-        const doc = await docRef.get();
-        if (!doc.exists) continue;
+      const uniqueIds = messageIds.map((id) => new Types.ObjectId(id));
 
-        const data = doc.data();
-        if (!data) continue;
+      const filter = {
+        _id: { $in: uniqueIds },
+        contractId: contractObjectId,
+        senderId: { $ne: readerObjectId },
+        readBy: { $ne: readerObjectId },
+      };
 
-        const isOwnMessage = data.senderId === readerId;
-        const currentReadBy = Array.isArray(data.readBy) ? data.readBy : [];
-        const alreadyRead = currentReadBy.includes(readerId);
+      const messagesToUpdate = await Message.find(filter).select('_id').lean();
+      const idsToUpdate = messagesToUpdate.map((m) => m._id);
 
-        if (isOwnMessage || alreadyRead) continue;
-
-        await docRef.update({
-          readBy: [...currentReadBy, readerId],
-        });
-        updatedMessageIds.push(doc.id);
+      if (idsToUpdate.length > 0) {
+        await Message.updateMany(
+          { _id: { $in: idsToUpdate } },
+          { $addToSet: { readBy: readerObjectId } },
+        );
       }
-      return updatedMessageIds;
+
+      return idsToUpdate.map((id) => id.toString());
     }
 
-    const snapshot = await messagesRef
-      .orderBy('timestamp', 'desc')
+    // Default: mark last 200 messages as read
+    const filter = {
+      contractId: contractObjectId,
+      senderId: { $ne: readerObjectId },
+      readBy: { $ne: readerObjectId },
+    };
+
+    const messagesToUpdate = await Message.find(filter)
+      .sort({ createdAt: -1 })
       .limit(200)
-      .get();
+      .select('_id')
+      .lean();
 
-    for (const doc of snapshot.docs) {
-      const data = doc.data();
-      const isOwnMessage = data.senderId === readerId;
-      const currentReadBy = Array.isArray(data.readBy) ? data.readBy : [];
-      const alreadyRead = currentReadBy.includes(readerId);
+    const idsToUpdate = messagesToUpdate.map((m) => m._id);
 
-      if (isOwnMessage || alreadyRead) continue;
-
-      await doc.ref.update({
-        readBy: [...currentReadBy, readerId],
-      });
-      updatedMessageIds.push(doc.id);
+    if (idsToUpdate.length > 0) {
+      await Message.updateMany(
+        { _id: { $in: idsToUpdate } },
+        { $addToSet: { readBy: readerObjectId } },
+      );
     }
 
-    return updatedMessageIds;
+    return idsToUpdate.map((id) => id.toString());
   }
 }
 
