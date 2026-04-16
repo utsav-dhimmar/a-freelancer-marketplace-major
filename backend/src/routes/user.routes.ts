@@ -8,6 +8,8 @@ import {
   updateProfilePicture,
 } from '../controllers/user.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { loginSchema, registerSchema } from '../schemas/user.schema.js';
 import { uploadProfilePicture } from '../utils/multer.config.js';
 
 const router = Router();
@@ -15,10 +17,11 @@ const router = Router();
 router.post(
   '/register',
   uploadProfilePicture.single('profilePicture'),
+  validate(registerSchema),
   register,
 );
 
-router.post('/login', login);
+router.post('/login', validate(loginSchema), login);
 
 router.get('/me', authMiddleware, me);
 

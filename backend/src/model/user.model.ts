@@ -13,7 +13,7 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   role: 'client' | 'admin' | 'freelancer';
-  profilePicture: string;
+  profilePicture: string | null;
   clientRating: number;
   clientReviewCount: number;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -66,7 +66,6 @@ const userSchema = new Schema<IUser>(
     profilePicture: {
       type: String,
       default: null,
-      index: true,
     },
     clientRating: {
       type: Number,

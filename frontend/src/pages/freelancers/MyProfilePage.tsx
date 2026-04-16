@@ -75,6 +75,16 @@ export function MyProfilePage() {
     }
   };
 
+  const handleDeactivateProfile = async () => {
+    if (!confirm('Are you sure you want to deactivate your freelancer profile? This will hide your profile from search results and you will not be able to apply for new jobs. Your user account will remain active.')) return;
+    try {
+      await freelancerApi.deleteProfile();
+      window.location.href = '/dashboard';
+    } catch (error) {
+      console.error('Failed to deactivate profile:', error);
+    }
+  };
+
   const handlePictureUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -184,7 +194,7 @@ export function MyProfilePage() {
                   }
                   rows={4}
                 />
-                <div className="mb-3">
+                <div className="">
                   <label className="form-label">Skills</label>
                   <div className="d-flex gap-2 mb-2">
                     <Input
@@ -401,6 +411,23 @@ export function MyProfilePage() {
               <p className="mb-0">{freelancer?.portfolio?.length || 0}</p>
             </div>
           </Card>
+
+          {!isCreating && (
+            <Card className="mt-3 border-danger">
+              <h5 className="text-danger">Danger Zone</h5>
+              <p className="small text-muted mb-3">
+                Retire your freelancer profile. This does not delete your main user account.
+              </p>
+              <Button
+                variant="outline-danger"
+                size="sm"
+                onClick={handleDeactivateProfile}
+                className="w-100"
+              >
+                Deactivate Freelancer Profile
+              </Button>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -26,6 +26,16 @@ export function MyJobsPage() {
     }
   };
 
+  const handleCancelJob = async (id: string) => {
+    if (!confirm('Are you sure you want to cancel this job? This action cannot be undone.')) return;
+    try {
+      await jobApi.updateStatus(id, 'cancelled');
+      loadJobs();
+    } catch (error) {
+      console.error('Failed to cancel job:', error);
+    }
+  };
+
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'open':
@@ -136,6 +146,15 @@ export function MyJobsPage() {
                         View Proposals
                       </Button>
                     </Link>
+                    {job.status === 'open' && (
+                      <Button
+                        variant="outline-danger"
+                        className="w-100"
+                        onClick={() => handleCancelJob(job._id)}
+                      >
+                        Cancel Job
+                      </Button>
+                    )}
                   </div>
                 </div>
               </Card>

@@ -10,6 +10,8 @@ import {
   deleteJob,
 } from '../controllers/job.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createJobSchema, updateJobSchema } from '../schemas/job.schema.js';
 
 const router = Router();
 
@@ -46,14 +48,14 @@ router.get('/:id', getJobById);
  * @desc    Create new job posting
  * @access  Private (Client only)
  */
-router.post('/', authMiddleware, createJob);
+router.post('/', authMiddleware, validate(createJobSchema), createJob);
 
 /**
  * @route   PUT /api/jobs/:id
  * @desc    Update job posting
  * @access  Private (Owner only)
  */
-router.put('/:id', authMiddleware, updateJob);
+router.put('/:id', authMiddleware, validate(updateJobSchema), updateJob);
 
 /**
  * @route   PATCH /api/jobs/:id/status

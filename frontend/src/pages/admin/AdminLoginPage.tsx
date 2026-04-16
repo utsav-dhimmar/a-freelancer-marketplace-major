@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminApi } from '../../api/admin';
 import { useAuth } from '../../contexts/AuthContext';
+import { Input, Button } from '../../components/ui';
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
@@ -61,67 +62,37 @@ export function AdminLoginPage() {
           )}
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label
-                htmlFor="admin-email"
-                className="form-label small fw-bold text-muted text-uppercase tracking-wider"
-                style={{ fontSize: '0.7rem' }}
-              >
-                Email Address
-              </label>
-              <div className="input-group">
-                <input
-                  id="admin-email"
-                  type="email"
-                  className="form-control bg-light border-start-0 ps-0"
-                  placeholder="admin@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                />
-              </div>
-            </div>
+            <Input
+              id="admin-email"
+              type="email"
+              label="Email Address"
+              className="bg-light"
+              placeholder="admin@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus
+            />
 
-            <div className="mb-5">
-              <label
-                htmlFor="admin-password"
-                className="form-label small fw-bold text-muted text-uppercase tracking-wider"
-                style={{ fontSize: '0.7rem' }}
-              >
-                Password
-              </label>
-              <div className="input-group">
-                <input
-                  id="admin-password"
-                  type="password"
-                  className="form-control bg-light border-start-0 ps-0"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
+            <Input
+              id="admin-password"
+              type="password"
+              label="Password"
+              className="bg-light"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-            <button
+            <Button
               type="submit"
-              className="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm"
-              disabled={loading || !email || !password}
+              className="w-100 py-3 rounded-3 fw-bold shadow-sm"
+              isLoading={loading}
+              disabled={!email || !password}
             >
-              {loading ? (
-                <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Signing in...
-                </>
-              ) : (
-                'Sign In to Dashboard'
-              )}
-            </button>
+              Sign In to Dashboard
+            </Button>
           </form>
         </div>
         <div className="card-footer bg-light border-0 py-3 text-center">

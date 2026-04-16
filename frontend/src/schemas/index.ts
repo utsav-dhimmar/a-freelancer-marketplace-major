@@ -8,7 +8,10 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   email: z.email('Invalid email address'),
   fullname: z.string().trim().min(3, 'Fullname must be at least 3 characters'),
-  username: z.string().min(3, 'Username must be at least 3 characters'),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .max(30, 'Username cannot exceed 30 characters'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.enum(['client', 'freelancer']),
   agreedToTerms: z.boolean().refine((val) => val === true, {
@@ -17,47 +20,76 @@ export const registerSchema = z.object({
 });
 
 export const jobSchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters'),
-  description: z.string().min(20, 'Description must be at least 20 characters'),
-  skillsRequired: z.array(z.string()).min(1, 'At least one skill is required'),
+  title: z
+    .string({ error: 'Title is required' })
+    .min(10, 'Title must be at least 10 characters'),
+  description: z
+    .string({ error: 'Description is required' })
+    .min(20, 'Description must be at least 20 characters'),
+  skillsRequired: z
+    .array(z.string())
+    .min(1, 'At least one skill is required'),
   budgetType: z.enum(['fixed', 'hourly']),
-  budgetAmount: z.number().min(1, 'Budget amount must be at least 1'),
+  budgetAmount: z
+    .number({ error: 'Budget amount is required' })
+    .min(1, 'Budget amount must be at least 1'),
   difficulty: z.enum(['entry', 'intermediate', 'expert']),
-  deadline: z.string().refine((date) => new Date(date) > new Date(), {
-    message: 'Deadline must be in the future',
-  }),
+  deadline: z
+    .string({ error: 'Deadline is required' })
+    .refine((date) => new Date(date) > new Date(), {
+      message: 'Deadline must be in the future',
+    }),
 });
 
 export const proposalSchema = z.object({
   coverLetter: z
-    .string()
-    .min(50, 'Cover letter must be at least 50 characters'),
-  bidAmount: z.number().min(1, 'Bid amount must be at least 1'),
-  estimatedTime: z.string().min(1, 'Estimated time is required'),
+    .string({ error: 'Cover letter is required' })
+    .min(20, 'Cover letter must be at least 20 characters'),
+  bidAmount: z
+    .number({ error: 'Bid amount is required' })
+    .min(1, 'Bid amount must be at least 1'),
+  estimatedTime: z
+    .string({ error: 'Estimated time is required' })
+    .min(1, 'Estimated time is required'),
 });
 
 export const freelancerSchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters'),
-  bio: z.string().min(20, 'Bio must be at least 20 characters'),
-  skills: z.array(z.string()).min(1, 'At least one skill is required'),
-  hourlyRate: z.number().min(1, 'Hourly rate must be at least 1'),
+  title: z
+    .string({ error: 'Title is required' })
+    .min(5, 'Title must be at least 5 characters'),
+  bio: z
+    .string({ error: 'Bio is required' })
+    .min(20, 'Bio must be at least 20 characters'),
+  skills: z
+    .array(z.string())
+    .min(1, 'At least one skill is required'),
+  hourlyRate: z
+    .number({ error: 'Hourly rate is required' })
+    .min(1, 'Hourly rate must be at least 1'),
 });
 
 export const portfolioItemSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  imageUrl: z.url().optional(),
-  link: z.url().optional(),
+  title: z
+    .string({ error: 'Title is required' })
+    .min(3, 'Title must be at least 3 characters'),
+  description: z
+    .string({ error: 'Description is required' })
+    .min(10, 'Description must be at least 10 characters')
+    .max(500, 'Description cannot exceed 500 characters'),
+  imageUrl: z.string().url().optional(),
+  link: z.string().url().optional(),
 });
 
 export const contractWorkSchema = z.object({
   workDescription: z
-    .string()
+    .string({ error: 'Work description is required' })
     .min(20, 'Work description must be at least 20 characters'),
 });
 
 export const disputeSchema = z.object({
-  reason: z.string().min(20, 'Reason must be at least 20 characters'),
+  reason: z
+    .string({ error: 'Reason is required' })
+    .min(20, 'Reason must be at least 20 characters'),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

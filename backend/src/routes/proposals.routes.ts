@@ -9,6 +9,11 @@ import {
   getProposalByProposalId,
 } from '../controllers/proposals.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import {
+  createProposalSchema,
+  updateProposalStatusSchema,
+} from '../schemas/proposal.schema.js';
 
 const router = Router();
 
@@ -38,7 +43,7 @@ router.get('/:id', authMiddleware, getProposalByProposalId);
  * @desc    Submit proposal to job
  * @access  Private (Freelancer only)
  */
-router.post('/', authMiddleware, createProposal);
+router.post('/', authMiddleware, validate(createProposalSchema), createProposal);
 
 /**
  * @route   PUT /api/proposals/:id
@@ -52,7 +57,12 @@ router.put('/:id', authMiddleware, updateProposal);
  * @desc    Update proposal status
  * @access  Private (Job Owner only)
  */
-router.patch('/:id/status', authMiddleware, updateProposalStatus);
+router.patch(
+  '/:id/status',
+  authMiddleware,
+  validate(updateProposalStatusSchema),
+  updateProposalStatus,
+);
 
 /**
  * @route   DELETE /api/proposals/:id

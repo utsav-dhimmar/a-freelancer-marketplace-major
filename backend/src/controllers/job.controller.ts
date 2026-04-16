@@ -34,38 +34,6 @@ export const createJob = asyncHandler(
       deadline,
     } = req.body;
 
-    // Validate required fields
-    if (
-      !title ||
-      !description ||
-      !difficulty ||
-      budget === undefined ||
-      !budgetType
-    ) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'All fields are required (title, description, difficulty, budget, budgetType)',
-      );
-    }
-
-    // Validate difficulty
-    const validDifficulties = ['entry', 'intermediate', 'expert'];
-    if (!validDifficulties.includes(difficulty)) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Invalid difficulty. Must be entry, intermediate, or expert',
-      );
-    }
-
-    // Validate budgetType
-    const validBudgetTypes = ['fixed', 'hourly'];
-    if (!validBudgetTypes.includes(budgetType)) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Invalid budget type. Must be fixed or hourly',
-      );
-    }
-
     const job = await jobService.createJob({
       client: String(req.user._id),
       title,
@@ -97,9 +65,6 @@ export const getAllJobs = asyncHandler(
 
     const result = await jobService.getAllJobs(page, limit, status);
 
-    if (!result.jobs || result.jobs.length === 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Jobs not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Jobs retrieved', result));
@@ -135,9 +100,6 @@ export const searchJobs = asyncHandler(
     };
 
     const result = await jobService.searchJobs(filters, page, limit);
-    if (!result.jobs || result.jobs.length == 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Jobs not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Search results', result));
@@ -169,9 +131,6 @@ export const getMyJobs = asyncHandler(
       page,
       limit,
     );
-    if (!result.jobs || result.jobs.length == 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Jobs not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Your jobs retrieved', result));
@@ -229,6 +188,7 @@ export const updateJob = asyncHandler(
       budget,
       budgetType,
       skillsRequired,
+      deadline,
     } = req.body;
 
     const job = await jobService.updateJob(id, {
@@ -238,6 +198,7 @@ export const updateJob = asyncHandler(
       budget,
       budgetType,
       skillsRequired,
+      deadline,
     });
 
     if (!job) {

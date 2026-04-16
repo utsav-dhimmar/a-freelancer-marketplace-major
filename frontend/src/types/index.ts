@@ -76,10 +76,10 @@ export interface IProposal {
 
 export interface IContract {
   _id: string;
-  jobId: string;
-  clientId: string;
-  freelancerId: string;
-  proposalId: string;
+  job: IJob;
+  client: IUser;
+  freelancer: IUser;
+  proposal: IProposal;
   amount: number;
   startDate: string;
   endDate?: string;

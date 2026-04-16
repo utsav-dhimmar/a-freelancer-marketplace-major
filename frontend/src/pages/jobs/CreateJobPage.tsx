@@ -97,7 +97,7 @@ export function CreateJobPage() {
                 )}
               </div>
 
-              <div className="mb-3">
+              <div className="">
                 <label className="form-label">Skills Required</label>
                 <div className="d-flex gap-2 mb-2">
                   <Input

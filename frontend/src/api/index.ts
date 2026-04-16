@@ -11,6 +11,7 @@ import type {
   IReview,
   IUser,
   ApiResponse,
+  JobStatus,
 } from '../types';
 
 export const API_URL =
@@ -186,13 +187,36 @@ export const authApi = {
 
 export const jobApi = {
   getAll: async (params?: {
-    search?: string;
+    page?: number;
+    limit?: number;
     status?: string;
-    skills?: string;
   }) => {
     const response = await api.get<
       ApiResponse<{ jobs: IJob[]; total: number }>
     >('/jobs', {
+      params,
+    });
+    return response.data.data;
+  },
+
+  search: async (params: {
+    page?: number;
+    limit?: number;
+    skills?: string;
+    difficulty?: 'entry' | 'intermediate' | 'expert';
+    budgetType?: 'fixed' | 'hourly';
+    minBudget?: number;
+    maxBudget?: number;
+    status?: JobStatus;
+  }) => {
+    const response = await api.get<
+      ApiResponse<{
+        jobs: IJob[];
+        total: number;
+        page: number;
+        totalPages: number;
+      }>
+    >('/jobs/search', {
       params,
     });
     return response.data.data;
@@ -220,6 +244,14 @@ export const jobApi = {
     await api.delete(`/jobs/${id}`);
   },
 
+  updateStatus: async (id: string, status: string) => {
+    const response = await api.patch<ApiResponse<{ job: IJob }>>(
+      `/jobs/${id}/status`,
+      { status },
+    );
+    return response.data.data.job;
+  },
+
   myJobs: async () => {
     const response =
       await api.get<ApiResponse<{ jobs: IJob[] }>>('/jobs/my-jobs');
@@ -228,13 +260,38 @@ export const jobApi = {
 };
 
 export const freelancerApi = {
-  getAll: async (params?: { search?: string; skills?: string }) => {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    skills?: string;
+  }) => {
+    // If skills are provided, use the search endpoint as per api2.md
+    if (params?.skills) {
+      return freelancerApi.search({
+        page: params.page,
+        limit: params.limit,
+        skills: params.skills,
+      });
+    }
+
     const response = await api.get<
       ApiResponse<{
         freelancers: IFreelancer[];
         total: number;
       }>
     >('/freelancers', { params });
+    return response.data.data;
+  },
+
+  search: async (params: { page?: number; limit?: number; skills: string }) => {
+    const response = await api.get<
+      ApiResponse<{
+        freelancers: IFreelancer[];
+        total: number;
+        page: number;
+        totalPages: number;
+      }>
+    >('/freelancers/search', { params });
     return response.data.data;
   },
 
@@ -267,6 +324,10 @@ export const freelancerApi = {
       data,
     );
     return response.data.data.freelancer;
+  },
+
+  deleteProfile: async () => {
+    await api.delete('/freelancers');
   },
 
   addPortfolioItem: async (item: IPortfolioItem) => {
@@ -319,6 +380,13 @@ export const proposalApi = {
       '/proposals/my-proposals',
     );
     return response.data.data.proposals;
+  },
+
+  getById: async (id: string) => {
+    const response = await api.get<ApiResponse<{ proposal: IProposal }>>(
+      `/proposals/${id}`,
+    );
+    return response.data.data.proposal;
   },
 
   update: async (id: string, data: Partial<IProposal>) => {

@@ -9,6 +9,7 @@ export interface IJob extends Document {
   budgetType: 'fixed' | 'hourly';
   skillsRequired: string[];
   status: 'open' | 'in_progress' | 'completed' | 'cancelled';
+  deadline?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +57,9 @@ const jobSchema = new Schema<IJob>(
       type: String,
       enum: ['open', 'in_progress', 'completed', 'cancelled'],
       default: 'open',
+    },
+    deadline: {
+      type: Date,
     },
   },
   {

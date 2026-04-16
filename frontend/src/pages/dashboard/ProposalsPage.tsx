@@ -100,17 +100,23 @@ export function ProposalsPage() {
                     </small>
                   </div>
                 </div>
-                {proposal.status === 'pending' &&
-                  user?.role === 'freelancer' && (
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => handleWithdraw(proposal._id)}
-                    >
-                      Withdraw
+                <div className="d-flex gap-2 mt-3">
+                  <Link to={`/dashboard/proposals/${proposal._id}`} className="flex-grow-1">
+                    <Button variant="outline-primary" size="sm" className="w-100">
+                      View Details
                     </Button>
-                  )}
+                  </Link>
+                  {proposal.status === 'pending' &&
+                    user?.role === 'freelancer' && (
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleWithdraw(proposal._id)}
+                      >
+                        Withdraw
+                      </Button>
+                    )}
+                </div>
               </Card>
             </div>
           ))}

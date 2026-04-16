@@ -19,24 +19,7 @@ import {
 export const register = asyncHandler(
   async (req: Request, res: Response, _next: NextFunction) => {
     const { username, fullname, email, password, role } = req.body;
-
-    // Validate required fields
-    if (!username || !fullname || !email || !password) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'All fields are required (username, fullname, email, password)',
-      );
-    }
-
-    // Validate role if provided
-    const validRoles = ['client', 'admin', 'freelancer'];
     const userRole = role || 'client';
-    if (!validRoles.includes(userRole)) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Invalid role. Must be client, admin, or freelancer',
-      );
-    }
 
     // Check if email already exists
     if (await userService.emailExists(email)) {
@@ -99,14 +82,6 @@ export const register = asyncHandler(
 export const login = asyncHandler(
   async (req: Request, res: Response, _next: NextFunction) => {
     const { email, password } = req.body;
-
-    // Validate required fields
-    if (!email || !password) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Email and password are required',
-      );
-    }
 
     // Find user by email
     const user = await userService.findByEmail(email);

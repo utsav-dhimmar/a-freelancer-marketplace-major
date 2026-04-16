@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { contractApi, jobApi, reviewApi } from '../../api';
+import { contractApi, reviewApi } from '../../api';
 import {
   Badge,
   Button,
@@ -11,13 +11,12 @@ import {
 } from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import { useAuth } from '../../contexts/AuthContext';
-import type { IContract, IJob } from '../../types';
+import type { IContract } from '../../types';
 
 export function ContractsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [contracts, setContracts] = useState<IContract[]>([]);
-  const [jobs, setJobs] = useState<Record<string, IJob>>({});
   const [loading, setLoading] = useState(true);
   const [selectedContract, setSelectedContract] = useState<IContract | null>(
     null,
@@ -43,19 +42,6 @@ export function ContractsPage() {
     try {
       const data = await contractApi.getMyContracts();
       setContracts(data);
-
-      const jobIds = Array.from(
-        new Set<string>(data.map((c: IContract) => String(c.jobId))),
-      );
-      const jobData: Record<string, IJob> = {};
-      for (const jobId of jobIds) {
-        if (!jobId) continue;
-        try {
-          const job = await jobApi.getById(jobId);
-          jobData[jobId] = job;
-        } catch {}
-      }
-      setJobs(jobData);
 
       // Check which completed contracts have already been reviewed
       const completedContracts = data.filter(

@@ -17,17 +17,6 @@ export const createReview = asyncHandler(
 
     const { contractId, rating, comment } = req.body;
 
-    if (!contractId) {
-      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Contract ID is required');
-    }
-
-    if (!rating || rating < 1 || rating > 5) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Rating is required and must be between 1 and 5',
-      );
-    }
-
     try {
       const review = await reviewService.createReview(
         String(req.user._id),

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { chatApi, contractApi, jobApi } from '../../api';
+import { chatApi, contractApi } from '../../api';
 import type { IChatMessage } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IContract, IJob } from '../../types';
@@ -168,6 +168,7 @@ export function ChatPage() {
 
       const contractData = await contractApi.getById(contractId);
       setContract(contractData);
+      setJob(contractData.job);
 
       // Only allow chat on active or submitted contracts
       if (!['active', 'submitted'].includes(contractData.status)) {
@@ -175,11 +176,6 @@ export function ChatPage() {
         setLoading(false);
         return;
       }
-
-      try {
-        const jobData = await jobApi.getById(contractData.jobId);
-        setJob(jobData);
-      } catch {}
 
       await loadMessages(true);
     } catch (err) {

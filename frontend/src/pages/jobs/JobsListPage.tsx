@@ -2,7 +2,14 @@ import type { SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { jobApi } from '../../api';
-import { Button, Badge, Spinner, EmptyState } from '../../components/ui';
+import {
+  Button,
+  Badge,
+  Spinner,
+  EmptyState,
+  Input,
+  Select,
+} from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import type { IJob, JobStatus } from '../../types';
 
@@ -19,8 +26,14 @@ const statusBadgeVariants: Record<
 export function JobsListPage() {
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<JobStatus | ''>('');
+  const [skills, setSkills] = useState('');
+  const [status, setStatus] = useState<JobStatus | ''>('open');
+  const [difficulty, setDifficulty] = useState<
+    'entry' | 'intermediate' | 'expert' | ''
+  >('');
+  const [budgetType, setBudgetType] = useState<'fixed' | 'hourly' | ''>('');
+  const [minBudget, setMinBudget] = useState<number | ''>('');
+  const [maxBudget, setMaxBudget] = useState<number | ''>('');
 
   useEffect(() => {
     void loadJobs();
@@ -28,12 +41,26 @@ export function JobsListPage() {
 
   const loadJobs = async () => {
     setLoading(true);
-    setJobs([]);
     try {
-      const params: { search?: string; status?: string } = {};
-      if (search) params.search = search;
+      const params: any = {};
+      if (skills) params.skills = skills;
       if (status) params.status = status;
-      const data = await jobApi.getAll(params);
+      if (difficulty) params.difficulty = difficulty;
+      if (budgetType) params.budgetType = budgetType;
+      if (minBudget !== '') params.minBudget = Number(minBudget);
+      if (maxBudget !== '') params.maxBudget = Number(maxBudget);
+
+      // Use search endpoint if any filter is present, otherwise use getAll
+      let data;
+      const hasFilters =
+        skills || difficulty || budgetType || minBudget !== '' || maxBudget !== '';
+      
+      if (hasFilters) {
+        data = await jobApi.search(params);
+      } else {
+        data = await jobApi.getAll({ status: status || undefined });
+      }
+      
       setJobs(data.jobs);
     } catch (error) {
       console.error('Failed to load jobs:', error);
@@ -58,40 +85,96 @@ export function JobsListPage() {
 
       <form onSubmit={handleSearch} className="card border-0 shadow-sm mb-4">
         <div className="card-body">
-          <div className="row g-3 align-items-end">
+          <div className="row g-3">
             <div className="col-12 col-md-6">
-              <label className="form-label small text-uppercase text-muted">
-                Search
-              </label>
-              <input
+              <Input
+                label="Skills (comma separated)"
                 type="text"
-                className="form-control"
-                placeholder="Search jobs by title, skill, or keyword..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
+                placeholder="React, Node.js, TypeScript..."
+                value={skills}
+                onChange={(event) => setSkills(event.target.value)}
               />
             </div>
-            <div className="col-12 col-md-4">
-              <label className="form-label small text-uppercase text-muted">
-                Status
-              </label>
-              <select
-                className="form-select"
+            <div className="col-12 col-md-3">
+              <Select
+                label="Status"
                 value={status}
                 onChange={(event) =>
                   setStatus(event.target.value as JobStatus | '')
                 }
-              >
-                <option value="">All Statuses</option>
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+                options={[
+                  { value: '', label: 'All Statuses' },
+                  { value: 'open', label: 'Open' },
+                  { value: 'in_progress', label: 'In Progress' },
+                  { value: 'completed', label: 'Completed' },
+                  { value: 'cancelled', label: 'Cancelled' },
+                ]}
+              />
             </div>
-            <div className="col-12 col-md-2 d-grid">
+            <div className="col-12 col-md-3">
+              <Select
+                label="Difficulty"
+                value={difficulty}
+                onChange={(event) =>
+                  setDifficulty(
+                    event.target.value as
+                      | 'entry'
+                      | 'intermediate'
+                      | 'expert'
+                      | '',
+                  )
+                }
+                options={[
+                  { value: '', label: 'All Levels' },
+                  { value: 'entry', label: 'Entry' },
+                  { value: 'intermediate', label: 'Intermediate' },
+                  { value: 'expert', label: 'Expert' },
+                ]}
+              />
+            </div>
+            <div className="col-12 col-md-3">
+              <Select
+                label="Budget Type"
+                value={budgetType}
+                onChange={(event) =>
+                  setBudgetType(event.target.value as 'fixed' | 'hourly' | '')
+                }
+                options={[
+                  { value: '', label: 'Any Type' },
+                  { value: 'fixed', label: 'Fixed Price' },
+                  { value: 'hourly', label: 'Hourly Rate' },
+                ]}
+              />
+            </div>
+            <div className="col-12 col-md-3">
+              <Input
+                label="Min Budget"
+                type="number"
+                placeholder="Min"
+                value={minBudget}
+                onChange={(event) =>
+                  setMinBudget(
+                    event.target.value === '' ? '' : Number(event.target.value),
+                  )
+                }
+              />
+            </div>
+            <div className="col-12 col-md-3">
+              <Input
+                label="Max Budget"
+                type="number"
+                placeholder="Max"
+                value={maxBudget}
+                onChange={(event) =>
+                  setMaxBudget(
+                    event.target.value === '' ? '' : Number(event.target.value),
+                  )
+                }
+              />
+            </div>
+            <div className="col-12 col-md-3 d-grid align-items-end">
               <Button type="submit" className="text-uppercase">
-                Search
+                Apply Filters
               </Button>
             </div>
           </div>
@@ -158,6 +241,11 @@ export function JobsListPage() {
                             {job.budgetType === 'hourly' ? ' /hr' : ' fixed'}
                           </span>
                         </p>
+                        {job.deadline && (
+                          <p className="mb-0 text-muted small">
+                            Deadline: {new Date(job.deadline).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
                       <Button variant="outline-secondary" size="sm">
                         View Details

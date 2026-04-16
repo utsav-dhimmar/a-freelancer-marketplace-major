@@ -26,9 +26,6 @@ export const getContracts = asyncHandler(
       page,
       limit,
     );
-    if (!result.contracts || result.contracts.length == 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Contracts not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Contracts retrieved', result));

@@ -6,6 +6,8 @@ import {
   checkReviewed,
 } from '../controllers/review.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createReviewSchema } from '../schemas/review.schema.js';
 
 const router = Router();
 
@@ -14,7 +16,7 @@ const router = Router();
  * @desc    Create a review for the other party on a completed contract
  * @access  Private
  */
-router.post('/', authMiddleware, createReview);
+router.post('/', authMiddleware, validate(createReviewSchema), createReview);
 
 /**
  * @route   GET /api/reviews/contract/:contractId

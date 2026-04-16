@@ -33,14 +33,6 @@ export const createFreelancer = asyncHandler(
 
     const { title, bio, skills, hourlyRate, portfolio } = req.body;
 
-    // Validate required fields
-    if (!title || hourlyRate === undefined) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Title and hourly rate are required',
-      );
-    }
-
     const freelancer = await freelancerService.createFreelancer({
       user: String(req.user._id),
       title,
@@ -122,9 +114,6 @@ export const getAllFreelancers = asyncHandler(
     const limit = parseInt(req.query.limit as string) || 10;
 
     const result = await freelancerService.getAllFreelancers(page, limit);
-    if (!result.freelancers || result.freelancers.length == 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Freelancers not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Freelancers retrieved', result));
@@ -154,9 +143,6 @@ export const searchFreelancers = asyncHandler(
       page,
       limit,
     );
-    if (!result.freelancers || result.freelancers.length == 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Freelancers not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Search results', result));
@@ -234,13 +220,6 @@ export const addPortfolioItem = asyncHandler(
     }
 
     const { title, link, desc } = req.body;
-
-    if (!title || !link) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Title and link are required',
-      );
-    }
 
     const freelancer = await freelancerService.addPortfolioItem(
       String(req.user._id),

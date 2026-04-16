@@ -37,9 +37,6 @@ export const getProposalsByJobId = asyncHandler(
       page,
       limit,
     );
-    if (!result.proposals || result.proposals.length === 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Proposals not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, 'Proposals retrieved', result));
@@ -109,9 +106,6 @@ export const getFreelancerProposals = asyncHandler(
       page,
       limit,
     );
-    if (!result.proposals || result.proposals.length === 0) {
-      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Proposals not found');
-    }
     res
       .status(HTTP_STATUS.OK)
       .json(
@@ -138,14 +132,6 @@ export const createProposal = asyncHandler(
     }
 
     const { job, coverLetter, bidAmount, estimatedTime } = req.body;
-
-    // Validate required fields
-    if (!job || !coverLetter || bidAmount === undefined || !estimatedTime) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'All fields are required (job, coverLetter, bidAmount, estimatedTime)',
-      );
-    }
 
     // Check if job exists and is open
     const jobDoc = await jobService.findById(job);
@@ -251,15 +237,6 @@ export const updateProposalStatus = asyncHandler(
 
     const id = req.params.id as string;
     const { status } = req.body;
-
-    // Validate status
-    const validStatuses = ['pending', 'shortlisted', 'accepted', 'rejected'];
-    if (!status || !validStatuses.includes(status)) {
-      throw new ApiError(
-        HTTP_STATUS.BAD_REQUEST,
-        'Invalid status. Must be pending, shortlisted, accepted, or rejected',
-      );
-    }
 
     // Get proposal with job info
     const proposal = await proposalService.getProposalWithJobClient(id);

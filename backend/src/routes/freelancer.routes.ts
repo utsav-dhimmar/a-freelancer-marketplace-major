@@ -11,6 +11,12 @@ import {
   removePortfolioItem,
 } from '../controllers/freelancer.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import {
+  addPortfolioItemSchema,
+  setupFreelancerSchema,
+  updateFreelancerSchema,
+} from '../schemas/freelancer.schema.js';
 
 const router = Router();
 
@@ -47,14 +53,14 @@ router.get('/:id', getFreelancerById);
  * @desc    Create freelancer profile
  * @access  Private (Freelancer role only)
  */
-router.post('/', authMiddleware, createFreelancer);
+router.post('/', authMiddleware, validate(setupFreelancerSchema), createFreelancer);
 
 /**
  * @route   PUT /api/freelancers
  * @desc    Update freelancer profile
  * @access  Private
  */
-router.put('/', authMiddleware, updateFreelancer);
+router.put('/', authMiddleware, validate(updateFreelancerSchema), updateFreelancer);
 
 /**
  * @route   DELETE /api/freelancers
@@ -68,7 +74,12 @@ router.delete('/', authMiddleware, deleteFreelancer);
  * @desc    Add portfolio item
  * @access  Private
  */
-router.post('/portfolio', authMiddleware, addPortfolioItem);
+router.post(
+  '/portfolio',
+  authMiddleware,
+  validate(addPortfolioItemSchema),
+  addPortfolioItem,
+);
 
 /**
  * @route   DELETE /api/freelancers/portfolio/:index

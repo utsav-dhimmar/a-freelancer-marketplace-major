@@ -8,16 +8,16 @@ import type { IFreelancer } from '../../types';
 export function FreelancersListPage() {
   const [freelancers, setFreelancers] = useState<IFreelancer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [skills, setSkills] = useState('');
 
   useEffect(() => {
-    loadFreelancers();
+    void loadFreelancers();
   }, []);
 
   const loadFreelancers = async () => {
     setLoading(true);
     try {
-      const data = await freelancerApi.getAll({ search });
+      const data = await freelancerApi.getAll({ skills });
       setFreelancers(data.freelancers);
     } catch (error) {
       console.error('Failed to load freelancers:', error);
@@ -28,7 +28,7 @@ export function FreelancersListPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    loadFreelancers();
+    void loadFreelancers();
   };
 
   return (
@@ -41,9 +41,9 @@ export function FreelancersListPage() {
             <input
               type="text"
               className="form-control"
-              placeholder="Search by skills..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by skills (e.g. React, Node.js)..."
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
             />
           </div>
           <div className="col-md-2">

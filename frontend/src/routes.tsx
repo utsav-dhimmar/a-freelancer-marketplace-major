@@ -64,6 +64,11 @@ const ProposalsPage = lazy(() =>
     default: module.ProposalsPage,
   })),
 );
+const ProposalDetailPage = lazy(() =>
+  import('./pages/dashboard/ProposalDetailPage').then((module) => ({
+    default: module.ProposalDetailPage,
+  })),
+);
 const ContractsPage = lazy(() =>
   import('./pages/dashboard/ContractsPage').then((module) => ({
     default: module.ContractsPage,
@@ -193,6 +198,14 @@ export const routes: RouteObject[] = [
         element: (
           <ProtectedRoute allowedRoles={['freelancer', 'client']}>
             <ProposalsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dashboard/proposals/:id',
+        element: (
+          <ProtectedRoute allowedRoles={['freelancer']}>
+            <ProposalDetailPage />
           </ProtectedRoute>
         ),
       },

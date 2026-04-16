@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from 'react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?:
@@ -16,46 +16,52 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
-export const Button = ({
-  variant = 'primary',
-  size = 'md',
-  isLoading,
-  className = '',
-  children,
-  disabled,
-  ref,
-  ...props
-}: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) => {
-  const variantMap: Record<string, string> = {
-    primary: 'btn-primary',
-    secondary: 'btn-secondary',
-    outline: 'btn-outline-secondary',
-    'outline-primary': 'btn-outline-primary',
-    'outline-secondary': 'btn-outline-secondary',
-    'outline-danger': 'btn-outline-danger',
-    ghost: 'btn-link text-secondary',
-    danger: 'btn-danger',
-    success: 'btn-success',
-  };
-  const sizeClass = size === 'md' ? '' : `btn-${size}`;
-  const variantClass = variantMap[variant || 'primary'] ?? variantMap.primary;
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = 'primary',
+      size = 'md',
+      isLoading,
+      className = '',
+      children,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
+    const variantMap: Record<string, string> = {
+      primary: 'btn-primary',
+      secondary: 'btn-secondary',
+      outline: 'btn-outline-secondary',
+      'outline-primary': 'btn-outline-primary',
+      'outline-secondary': 'btn-outline-secondary',
+      'outline-danger': 'btn-outline-danger',
+      ghost: 'btn-link text-secondary',
+      danger: 'btn-danger',
+      success: 'btn-success',
+    };
+    const sizeClass = size === 'md' ? '' : `btn-${size}`;
+    const variantClass = variantMap[variant || 'primary'] ?? variantMap.primary;
 
-  return (
-    <button
-      ref={ref}
-      className={`btn ${variantClass} ${sizeClass} ${className}`}
-      disabled={disabled || isLoading}
-      {...props}
-    >
-      {isLoading ? (
-        <span
-          className="spinner-border spinner-border-sm"
-          role="status"
-          aria-hidden="true"
-        ></span>
-      ) : (
-        children
-      )}
-    </button>
-  );
-};
+    return (
+      <button
+        ref={ref}
+        className={`btn ${variantClass} ${sizeClass} ${className}`}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        {isLoading ? (
+          <span
+            className="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        ) : (
+          children
+        )}
+      </button>
+    );
+  },
+);
+
+Button.displayName = 'Button';
