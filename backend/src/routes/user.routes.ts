@@ -6,6 +6,7 @@ import {
   refreshTokenHandler,
   register,
   updateProfilePicture,
+  getUserPublicProfile,
 } from '../controllers/user.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
@@ -40,5 +41,12 @@ router.post(
   uploadProfilePicture.single('profilePicture'),
   updateProfilePicture,
 );
+
+/**
+ * @route   GET /api/users/profile/:id
+ * @desc    Get public profile info
+ * @access  Public
+ */
+router.get('/profile/:id', getUserPublicProfile);
 
 export default router;

@@ -183,6 +183,12 @@ export const authApi = {
     );
     return response.data.data;
   },
+  getPublicProfile: async (id: string) => {
+    const response = await api.get<
+      ApiResponse<{ user: IUser; freelancer: IFreelancer | null }>
+    >(`/users/profile/${id}`);
+    return response.data.data;
+  },
 };
 
 export const jobApi = {
@@ -356,7 +362,7 @@ export const freelancerApi = {
 
 export const proposalApi = {
   submit: async (data: {
-    job: string;
+    jobId: string;
     coverLetter: string;
     bidAmount: number;
     estimatedTime: string;

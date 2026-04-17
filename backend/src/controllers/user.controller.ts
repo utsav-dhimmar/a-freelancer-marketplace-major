@@ -3,6 +3,7 @@ import { HTTP_STATUS, TOKEN } from '../constants/index.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 import { userService } from '../services/user.service.js';
 import { emailService } from '../services/email.service.js';
+import { freelancerService } from '../services/freelancer.service.js';
 import { ApiError, ApiResponse } from '../utils/ApiHelper.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
@@ -275,6 +276,46 @@ export const updateProfilePicture = asyncHandler(
           createdAt: updatedUser.createdAt,
           updatedAt: updatedUser.updatedAt,
         },
+      }),
+    );
+  },
+);
+
+/**
+ * GET /api/users/profile/:id
+ * Get public profile info for any user by ID
+ */
+export const getUserPublicProfile = asyncHandler(
+  async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'User ID is required');
+    }
+
+    const user = await userService.findByIdSafe(id as string);
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'User not found');
+    }
+
+    let freelancerProfile = null;
+    if (user.role === 'freelancer') {
+      freelancerProfile = await freelancerService.findByUserId(id as string);
+    }
+
+    res.status(HTTP_STATUS.OK).json(
+      new ApiResponse(HTTP_STATUS.OK, 'User profile retrieved', {
+        user: {
+          id: user._id,
+          username: user.username,
+          fullname: user.fullname,
+          role: user.role,
+          profilePicture: user.profilePicture,
+          createdAt: user.createdAt,
+          clientRating: user.clientRating,
+          clientReviewCount: user.clientReviewCount,
+        },
+        freelancer: freelancerProfile,
       }),
     );
   },

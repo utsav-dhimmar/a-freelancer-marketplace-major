@@ -1,7 +1,7 @@
 import { type SyntheticEvent, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { jobApi, proposalApi } from '../../api';
-import { Button, Input, TextArea, DateDisplay } from '../../components/ui';
+import { Button, Input, TextArea, DateDisplay, UserProfileCard } from '../../components/ui';
 import { CURRENCY, formatCurrency } from '../../constants/currency';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IJob, IProposal } from '../../types';
@@ -68,7 +68,7 @@ export function JobDetailPage() {
     setSubmitting(true);
     try {
       await proposalApi.submit({
-        job: id,
+        jobId: id,
         ...proposalData,
       });
       navigate(`/jobs/${id}`);
@@ -201,6 +201,13 @@ export function JobDetailPage() {
             </div>
           </div>
 
+          {!isClient && (
+            <div className="mb-4">
+              <h5 className="mb-3">About the Client</h5>
+              <UserProfileCard user={job.client} variant="sidebar" />
+            </div>
+          )}
+
           {isAuthenticated && isClient && (
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body d-grid">
@@ -312,11 +319,10 @@ export function JobDetailPage() {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h5 className="mb-0">Your Proposal</h5>
                   <span
-                    className={`badge ${
-                      proposal.status === 'accepted'
+                    className={`badge ${proposal.status === 'accepted'
                         ? 'bg-success'
                         : 'bg-secondary'
-                    } text-uppercase`}
+                      } text-uppercase`}
                   >
                     {proposal.status}
                   </span>

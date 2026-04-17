@@ -5,10 +5,12 @@ import {
   AdminToast,
   AdminLoading,
   AdminEmpty,
+  AdminModal,
 } from './components';
 import type { Toast } from './components';
 import { adminApi } from '../../api/admin';
 import type { IAdminReview } from '../../types/admin';
+import { Button } from '../../components/ui';
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -34,6 +36,10 @@ export function AdminReviewsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  // Delete confirmation
+  const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     const id = ++toastId;
@@ -65,17 +71,25 @@ export function AdminReviewsPage() {
     fetchReviews();
   }, [fetchReviews]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this review?')) return;
+  const handleDeleteClick = (id: string) => {
+    setReviewToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!reviewToDelete) return;
+    setDeleting(true);
     try {
-      await adminApi.deleteReview(id);
+      await adminApi.deleteReview(reviewToDelete);
       showToast('Review deleted successfully', 'success');
+      setReviewToDelete(null);
       fetchReviews();
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : 'Failed to delete review',
         'error',
       );
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -165,9 +179,9 @@ export function AdminReviewsPage() {
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-1"
-                          onClick={() => handleDelete(review._id)}
+                          onClick={() => handleDeleteClick(review._id)}
                         >
-                          <span>🗑️</span> Delete
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -186,6 +200,46 @@ export function AdminReviewsPage() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AdminModal
+        title="Delete Review"
+        isOpen={!!reviewToDelete}
+        onClose={() => !deleting && setReviewToDelete(null)}
+        maxWidth="400px"
+        footer={
+          <>
+            <Button
+              type="button"
+              className="btn btn-light px-4 rounded-3 border"
+              onClick={() => setReviewToDelete(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="btn btn-danger px-4 rounded-3 fw-bold"
+              onClick={confirmDelete}
+              disabled={deleting}
+            >
+              {deleting ? 'Deleting...' : 'Delete Review'}
+            </Button>
+          </>
+        }
+      >
+        <div className="text-center py-2">
+          <div className="text-danger mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-trash3" viewBox="0 0 16 16">
+              <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+            </svg>
+          </div>
+          <h5 className="fw-bold">Delete this review?</h5>
+          <p className="text-muted mb-0 small">
+            This action is permanent and will remove the review from both user profiles.
+          </p>
+        </div>
+      </AdminModal>
     </AdminLayout>
   );
 }

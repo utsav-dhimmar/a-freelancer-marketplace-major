@@ -1,5 +1,8 @@
+import { Types } from 'mongoose';
 import { Review, type IReview } from '../model/review.model.js';
 import { Contract } from '../model/contracts.model.js';
+import { User } from '../model/user.model.js';
+import { Freelancer } from '../model/freelancer.model.js';
 import type { CreateReviewData } from '../types/review.types.js';
 
 export class ReviewService {
@@ -15,6 +18,10 @@ export class ReviewService {
     const contract = await Contract.findById(data.contractId);
     if (!contract) {
       throw new Error('CONTRACT_NOT_FOUND');
+    }
+
+    if (contract.status === 'disputed') {
+      throw new Error('CONTRACT_DISPUTED');
     }
 
     if (contract.status !== 'completed') {
@@ -57,11 +64,58 @@ export class ReviewService {
 
     await review.save();
 
+    // Trigger aggregate rating update
+    await this.updateRevieweeRating(revieweeId, targetRole);
+
     return review.populate([
       { path: 'reviewer', select: '-password -refreshToken' },
       { path: 'reviewee', select: '-password -refreshToken' },
       { path: 'contract' },
     ]);
+  }
+
+  /**
+   * Update aggregate rating for a user or freelancer
+   */
+  private async updateRevieweeRating(
+    revieweeId: string,
+    targetRole: 'client' | 'freelancer',
+  ) {
+    // Get all reviews for this reviewee in this role
+    const stats = await Review.aggregate([
+      {
+        $match: {
+          reviewee: new Types.ObjectId(revieweeId),
+          targetRole,
+        },
+      },
+      {
+        $group: {
+          _id: '$reviewee',
+          averageRating: { $avg: '$rating' },
+          reviewCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const statsFound = stats.length > 0;
+    const averageRating = statsFound ? stats[0].averageRating : 0;
+    const reviewCount = statsFound ? stats[0].reviewCount : 0;
+
+    if (targetRole === 'client') {
+      await User.findByIdAndUpdate(revieweeId, {
+        clientRating: Number(averageRating.toFixed(1)),
+        clientReviewCount: reviewCount,
+      });
+    } else {
+      await Freelancer.findOneAndUpdate(
+        { user: revieweeId },
+        {
+          rating: Number(averageRating.toFixed(1)),
+          reviewCount: reviewCount,
+        },
+      );
+    }
   }
 
   /**

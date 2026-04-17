@@ -128,6 +128,12 @@ const ProfilePage = lazy(() =>
   })),
 );
 
+const PublicProfilePage = lazy(() =>
+  import('./pages/shared/PublicProfilePage').then((module) => ({
+    default: module.PublicProfilePage,
+  })),
+);
+
 const TermsPage = lazy(() =>
   import('./pages/terms').then((module) => ({
     default: module.default,
@@ -176,6 +182,7 @@ export const routes: RouteObject[] = [
       },
       { path: '/freelancers', element: <FreelancersListPage /> },
       { path: '/freelancers/:id', element: <FreelancerProfilePage /> },
+      { path: '/profile/:id', element: <PublicProfilePage /> },
       { path: '/terms', element: <TermsPage /> },
       {
         path: '/freelancers/me',

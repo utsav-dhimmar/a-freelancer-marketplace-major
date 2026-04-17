@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { proposalApi, jobApi } from '../../api';
-import { Card, Button, DateDisplay } from '../../components/ui';
+import { Card, Button, DateDisplay, UserProfileCard, Modal } from '../../components/ui';
 import type { IProposal, IJob } from '../../types';
 import { formatCurrency } from '../../constants/currency';
 
@@ -11,6 +11,10 @@ export function JobProposalsPage() {
   const [job, setJob] = useState<IJob | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Modal states
+  const [confirmAcceptId, setConfirmAcceptId] = useState<string | null>(null);
+  const [confirmRejectId, setConfirmRejectId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -33,12 +37,17 @@ export function JobProposalsPage() {
     }
   };
 
-  const handleAccept = async (proposalId: string) => {
-    if (!confirm('Are you sure you want to accept this proposal?')) return;
-    setActionLoading(proposalId);
+  const handleAccept = (proposalId: string) => {
+    setConfirmAcceptId(proposalId);
+  };
+
+  const confirmAccept = async () => {
+    if (!confirmAcceptId) return;
+    setActionLoading(confirmAcceptId);
     try {
-      await proposalApi.accept(proposalId);
-      await loadData(); // Reload to get updated status
+      await proposalApi.accept(confirmAcceptId);
+      setConfirmAcceptId(null);
+      await loadData();
     } catch (error) {
       console.error('Failed to accept proposal:', error);
     } finally {
@@ -46,12 +55,17 @@ export function JobProposalsPage() {
     }
   };
 
-  const handleReject = async (proposalId: string) => {
-    if (!confirm('Are you sure you want to reject this proposal?')) return;
-    setActionLoading(proposalId);
+  const handleReject = (proposalId: string) => {
+    setConfirmRejectId(proposalId);
+  };
+
+  const confirmReject = async () => {
+    if (!confirmRejectId) return;
+    setActionLoading(confirmRejectId);
     try {
-      await proposalApi.reject(proposalId);
-      await loadData(); // Reload to get updated status
+      await proposalApi.reject(confirmRejectId);
+      setConfirmRejectId(null);
+      await loadData();
     } catch (error) {
       console.error('Failed to reject proposal:', error);
     } finally {
@@ -126,13 +140,8 @@ export function JobProposalsPage() {
               <Card>
                 <div className="row">
                   <div className="col-md-8">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <h4 className="h5 mb-0">
-                        Proposal from{' '}
-                        {proposal.freelancer?.fullname ||
-                          proposal.freelancer?.username ||
-                          'Freelancer'}
-                      </h4>
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <UserProfileCard user={proposal.freelancer} variant="mini" />
                       <span
                         className={`badge bg-${getStatusBadgeVariant(proposal.status)}`}
                       >
@@ -187,6 +196,32 @@ export function JobProposalsPage() {
           ))}
         </div>
       )}
+
+      {/* Accept Confirmation Modal */}
+      <Modal
+        isOpen={!!confirmAcceptId}
+        title="Accept Proposal"
+        variant="confirm"
+        confirmText="Accept Proposal"
+        onClose={() => !actionLoading && setConfirmAcceptId(null)}
+        onConfirm={confirmAccept}
+        isLoading={actionLoading === confirmAcceptId}
+      >
+        Are you sure you want to accept this proposal? This will start a contract with this freelancer.
+      </Modal>
+
+      {/* Reject Confirmation Modal */}
+      <Modal
+        isOpen={!!confirmRejectId}
+        title="Reject Proposal"
+        variant="confirm"
+        confirmText="Reject"
+        onClose={() => !actionLoading && setConfirmRejectId(null)}
+        onConfirm={confirmReject}
+        isLoading={actionLoading === confirmRejectId}
+      >
+        Are you sure you want to reject this proposal?
+      </Modal>
     </div>
   );
 }

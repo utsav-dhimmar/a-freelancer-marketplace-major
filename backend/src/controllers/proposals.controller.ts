@@ -131,10 +131,10 @@ export const createProposal = asyncHandler(
       );
     }
 
-    const { job, coverLetter, bidAmount, estimatedTime } = req.body;
+    const { jobId, coverLetter, bidAmount, estimatedTime } = req.body;
 
     // Check if job exists and is open
-    const jobDoc = await jobService.findById(job);
+    const jobDoc = await jobService.findById(jobId);
     if (!jobDoc) {
       throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Job not found');
     }
@@ -147,7 +147,7 @@ export const createProposal = asyncHandler(
 
     // Check if freelancer already submitted a proposal
     const hasSubmitted = await proposalService.hasSubmittedProposal(
-      job,
+      jobId,
       String(req.user._id),
     );
     if (hasSubmitted) {
@@ -158,7 +158,7 @@ export const createProposal = asyncHandler(
     }
 
     const proposal = await proposalService.createProposal({
-      job,
+      job: jobId,
       freelancer: String(req.user._id),
       coverLetter,
       bidAmount,

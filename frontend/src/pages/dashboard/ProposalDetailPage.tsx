@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { proposalApi } from '../../api';
-import { Button, Card, Badge, Spinner, EmptyState } from '../../components/ui';
+import { Button, Card, Badge, Spinner, EmptyState, UserProfileCard, Modal } from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import type { IProposal } from '../../types';
 
@@ -10,6 +10,10 @@ export function ProposalDetailPage() {
   const navigate = useNavigate();
   const [proposal, setProposal] = useState<IProposal | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Withdraw confirmation state
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -28,13 +32,21 @@ export function ProposalDetailPage() {
     }
   };
 
-  const handleWithdraw = async () => {
-    if (!proposal || !confirm('Are you sure you want to withdraw this proposal?')) return;
+  const handleWithdraw = () => {
+    setShowWithdrawModal(true);
+  };
+
+  const confirmWithdraw = async () => {
+    if (!proposal) return;
+    setWithdrawing(true);
     try {
       await proposalApi.withdraw(proposal._id);
+      setShowWithdrawModal(false);
       navigate('/dashboard/proposals');
     } catch (error) {
       console.error('Failed to withdraw proposal:', error);
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -96,7 +108,17 @@ export function ProposalDetailPage() {
           </Card>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-4 text-start">
+          <div className="mb-4">
+            <h5 className="mb-3">Freelancer Information</h5>
+             <UserProfileCard user={proposal.freelancer} variant="sidebar" />
+          </div>
+
+          <div className="mb-4">
+            <h5 className="mb-3">Client Information</h5>
+             <UserProfileCard user={proposal.job?.client} variant="sidebar" />
+          </div>
+
           <Card className="mb-4">
             <h5 className="mb-3">Job Information</h5>
             <p>
@@ -135,6 +157,19 @@ export function ProposalDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Withdraw Confirmation Modal */}
+      <Modal
+        isOpen={showWithdrawModal}
+        title="Withdraw Proposal"
+        variant="confirm"
+        confirmText="Yes, Withdraw"
+        onClose={() => !withdrawing && setShowWithdrawModal(false)}
+        onConfirm={confirmWithdraw}
+        isLoading={withdrawing}
+      >
+        Are you sure you want to withdraw this proposal? This action cannot be undone.
+      </Modal>
     </div>
   );
 }

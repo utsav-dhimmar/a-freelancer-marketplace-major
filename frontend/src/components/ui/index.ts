@@ -7,3 +7,6 @@ export { Badge } from './Badge';
 export { Spinner } from './Spinner';
 export { EmptyState } from './EmptyState';
 export { DateDisplay } from './DateDisplay';
+export * from './StarRating';
+export { UserProfileCard } from './UserProfileCard';
+export { Modal } from './Modal';

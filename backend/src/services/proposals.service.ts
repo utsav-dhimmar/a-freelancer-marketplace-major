@@ -43,7 +43,10 @@ export class ProposalService {
     const [proposals, total] = await Promise.all([
       Proposal.find(query)
         .populate([
-          { path: 'job' },
+          {
+            path: 'job',
+            populate: { path: 'client', select: '-password -refreshToken' },
+          },
           { path: 'freelancer', select: '-password -refreshToken' },
         ])
         .skip(skip)
@@ -79,7 +82,10 @@ export class ProposalService {
     const [proposals, total] = await Promise.all([
       Proposal.find(query)
         .populate([
-          { path: 'job' },
+          {
+            path: 'job',
+            populate: { path: 'client', select: '-password -refreshToken' },
+          },
           { path: 'freelancer', select: '-password -refreshToken' },
         ])
         .skip(skip)

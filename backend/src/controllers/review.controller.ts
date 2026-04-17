@@ -39,6 +39,11 @@ export const createReview = asyncHandler(
           status: HTTP_STATUS.BAD_REQUEST,
           message: 'You can only review after the contract is completed',
         },
+        CONTRACT_DISPUTED: {
+          status: HTTP_STATUS.FORBIDDEN,
+          message:
+            'Contract is disputed. Please resolve the dispute via chat before leaving a review.',
+        },
         NOT_CONTRACT_PARTY: {
           status: HTTP_STATUS.FORBIDDEN,
           message: 'You can only review someone you have worked with',

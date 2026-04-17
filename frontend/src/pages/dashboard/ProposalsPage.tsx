@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { proposalApi } from '../../api';
-import { Button, Card, Badge, Spinner, EmptyState } from '../../components/ui';
+import { Button, Card, Badge, Spinner, EmptyState, Modal } from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IProposal } from '../../types';
@@ -10,6 +10,10 @@ export function ProposalsPage() {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<IProposal[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Withdraw confirmation state
+  const [proposalToWithdraw, setProposalToWithdraw] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState(false);
   console.log(proposals);
   useEffect(() => {
     loadProposals();
@@ -26,13 +30,21 @@ export function ProposalsPage() {
     }
   };
 
-  const handleWithdraw = async (id: string) => {
-    if (!confirm('Are you sure you want to withdraw this proposal?')) return;
+  const handleWithdraw = (id: string) => {
+    setProposalToWithdraw(id);
+  };
+
+  const confirmWithdraw = async () => {
+    if (!proposalToWithdraw) return;
+    setWithdrawing(true);
     try {
-      await proposalApi.withdraw(id);
+      await proposalApi.withdraw(proposalToWithdraw);
+      setProposalToWithdraw(null);
       loadProposals();
     } catch (error) {
       console.error('Failed to withdraw proposal:', error);
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -122,6 +134,19 @@ export function ProposalsPage() {
           ))}
         </div>
       )}
+
+      {/* Withdraw Confirmation Modal */}
+      <Modal
+        isOpen={!!proposalToWithdraw}
+        title="Withdraw Proposal"
+        variant="confirm"
+        confirmText="Yes, Withdraw"
+        onClose={() => !withdrawing && setProposalToWithdraw(null)}
+        onConfirm={confirmWithdraw}
+        isLoading={withdrawing}
+      >
+        Are you sure you want to withdraw this proposal? This action cannot be undone.
+      </Modal>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { IContract, IJob } from '../../types';
 import { socketService } from '../../services/socket.service';
 import type { Socket } from 'socket.io-client';
+import { UserProfileCard } from '../../components/ui';
 
 interface SocketAckResponse {
   ok: boolean;
@@ -297,26 +298,25 @@ export function ChatPage() {
           </button>
           <div>
             <h5 className="mb-0">{job?.title || 'Contract Chat'}</h5>
-            <small className="text-muted">
-              Contract #{contractId?.slice(-6)} &middot;{' '}
-              <span
-                className={`badge ${
-                  contract?.status === 'active' ? 'bg-primary' : 'bg-warning'
-                }`}
-              >
+            <div className="d-flex align-items-center gap-2 mb-1">
+              <span className={`badge ${contract?.status === 'active' ? 'bg-primary' : 'bg-warning'}`}>
                 {contract?.status}
-              </span>{' '}
-              &middot;{' '}
-              <span
-                className={`badge ${
-                  isSocketConnected ? 'bg-success' : 'bg-secondary'
-                }`}
-              >
+              </span>
+              <span className={`badge ${isSocketConnected ? 'bg-success' : 'bg-secondary'}`}>
                 {isSocketConnected ? 'Live' : 'Offline'}
               </span>
-            </small>
+            </div>
           </div>
         </div>
+
+        {contract && (
+          <div className="d-none d-md-block">
+            <UserProfileCard 
+              user={user?.role === 'client' ? contract.freelancer : contract.client} 
+              variant="mini" 
+            />
+          </div>
+        )}
       </div>
 
       {/* Chat Area */}

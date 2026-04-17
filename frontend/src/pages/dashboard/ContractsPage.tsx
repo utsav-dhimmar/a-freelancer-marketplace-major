@@ -9,6 +9,9 @@ import {
   EmptyState,
   Spinner,
   TextArea,
+  StarRating,
+  UserProfileCard,
+  Modal,
 } from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import { useAuth } from '../../contexts/AuthContext';
@@ -34,6 +37,11 @@ export function ContractsPage() {
   const [reviewedContracts, setReviewedContracts] = useState<Set<string>>(
     new Set(),
   );
+
+  // New Modal States
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [contractToComplete, setContractToComplete] = useState<string | null>(null);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
   useEffect(() => {
     loadContracts();
@@ -80,14 +88,22 @@ export function ContractsPage() {
     }
   };
 
-  const handleComplete = async (id: string) => {
-    if (!confirm('Are you sure you want to mark this contract as completed?'))
-      return;
+  const handleComplete = (id: string) => {
+    setContractToComplete(id);
+    setShowConfirmModal(true);
+  };
+
+  const confirmComplete = async () => {
+    if (!contractToComplete) return;
+
     try {
-      await contractApi.completeContract(id);
+      await contractApi.completeContract(contractToComplete);
       loadContracts();
     } catch (error) {
       console.error('Failed to complete contract:', error);
+    } finally {
+      setShowConfirmModal(false);
+      setContractToComplete(null);
     }
   };
 
@@ -125,7 +141,7 @@ export function ContractsPage() {
       setReviewComment('');
     } catch (error: any) {
       const msg = error?.response?.data?.message || 'Failed to submit review';
-      alert(msg);
+      setAlertConfig({ title: 'Submission Error', message: msg });
     } finally {
       setReviewSubmitting(false);
     }
@@ -137,37 +153,12 @@ export function ContractsPage() {
       'primary' | 'secondary' | 'success' | 'danger' | 'warning'
     > = {
       active: 'primary',
+      submitted: 'warning',
       completed: 'success',
       disputed: 'danger',
     };
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
   };
-
-  /** Star rating picker component */
-  const StarRating = ({
-    value,
-    onChange,
-  }: {
-    value: number;
-    onChange: (v: number) => void;
-  }) => (
-    <div style={{ display: 'flex', gap: 4, cursor: 'pointer', fontSize: 28 }}>
-      {[1, 2, 3, 4, 5].map((star) => (
-        <span
-          key={star}
-          onClick={() => onChange(star)}
-          style={{
-            color: star <= value ? '#f59e0b' : '#d1d5db',
-            transition: 'color 0.15s',
-          }}
-          role="button"
-          aria-label={`${star} star${star > 1 ? 's' : ''}`}
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
 
   if (loading) {
     return (
@@ -176,7 +167,7 @@ export function ContractsPage() {
       </div>
     );
   }
-  console.log(contracts);
+
   return (
     <div className="container py-4">
       <h2 className="mb-4">My Contracts</h2>
@@ -192,11 +183,7 @@ export function ContractsPage() {
             <div key={contract._id} className="col-md-6 mb-4">
               <Card>
                 <div className="d-flex justify-content-between align-items-start mb-2">
-                  <h5 className="mb-0">
-                    {/*{jobs[contract.jobId]?.title || "Job"}*/}
-                    {/*TODO FIX IT*/}
-                    {contract.job.title}
-                  </h5>
+                  <h5 className="mb-0">{contract.job.title}</h5>
                   {getStatusBadge(contract.status)}
                 </div>
                 <div className="mb-3">
@@ -204,9 +191,15 @@ export function ContractsPage() {
                   <strong>{formatCurrency(contract.amount)}</strong>
                   <small className="text-muted">
                     {' '}
-                    | Started:{' '}
-                    <DateDisplay date={contract.startDate} />
+                    | Started: <DateDisplay date={contract.startDate} />
                   </small>
+                </div>
+
+                <div className="mb-3">
+                  <UserProfileCard 
+                    user={user?.role === 'client' ? contract.freelancer : contract.client} 
+                    variant="mini" 
+                  />
                 </div>
                 {contract.workSubmitted && (
                   <div className="mb-3">
@@ -215,9 +208,22 @@ export function ContractsPage() {
                   </div>
                 )}
                 <div className="d-flex flex-wrap gap-2">
-                  {contract.status === 'active' && (
+                  <Button
+                    size="sm"
+                    variant="outline-primary"
+                    onClick={() =>
+                      navigate(`/dashboard/contracts/${contract._id}/chat`)
+                    }
+                  >
+                    💬 Chat
+                  </Button>
+
+                  {/* Actions for Active / Submitted contracts */}
+                  {(contract.status === 'active' ||
+                    contract.status === 'submitted') && (
                     <>
-                      {user?.role !== 'client' && (
+                      {/* Freelancer: Submit work (only if active) */}
+                      {user?.role !== 'client' && contract.status === 'active' && (
                         <Button
                           size="sm"
                           onClick={() => setSelectedContract(contract)}
@@ -225,16 +231,9 @@ export function ContractsPage() {
                           Submit Work
                         </Button>
                       )}
-                      <Button
-                        size="sm"
-                        variant="outline-primary"
-                        onClick={() =>
-                          navigate(`/dashboard/contracts/${contract._id}/chat`)
-                        }
-                      >
-                        💬 Chat
-                      </Button>
-                      {user?.role === 'client' && (
+
+                      {/* Client: Mark Complete (only if submitted) */}
+                      {user?.role === 'client' && contract.status === 'submitted' && (
                         <Button
                           size="sm"
                           variant="success"
@@ -243,13 +242,25 @@ export function ContractsPage() {
                           Mark Complete
                         </Button>
                       )}
+
+                      {/* Both: Raise Dispute */}
+                      <Button
+                        size="sm"
+                        variant="outline-danger"
+                        onClick={() => {
+                          setSelectedContract({
+                            ...contract,
+                            status: 'disputed',
+                          } as any);
+                        }}
+                      >
+                        Raise Dispute
+                      </Button>
                     </>
                   )}
+
                   {contract.status === 'completed' && (
                     <>
-                      <span className="text-success">
-                        ✅ Contract completed
-                      </span>
                       {!reviewedContracts.has(contract._id) ? (
                         <Button
                           size="sm"
@@ -264,18 +275,20 @@ export function ContractsPage() {
                         </Button>
                       ) : (
                         <span
-                          className="text-muted small"
-                          style={{
-                            alignSelf: 'center',
-                          }}
+                          className="text-success small d-flex align-items-center"
+                          style={{ alignSelf: 'center' }}
                         >
                           ✓ Reviewed
                         </span>
                       )}
                     </>
                   )}
+
                   {contract.status === 'disputed' && (
-                    <span className="text-danger">Under dispute</span>
+                    <div className="w-100 p-2 mt-2 bg-light border border-danger rounded text-danger small">
+                      <strong>⚠️ Contract is disputed.</strong> Please chat with
+                      each other and solve the dispute before leaving a review.
+                    </div>
                   )}
                 </div>
               </Card>
@@ -402,6 +415,27 @@ export function ContractsPage() {
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <Modal
+        isOpen={showConfirmModal}
+        title="Confirm Completion"
+        variant="confirm"
+        confirmText="Yes, Complete"
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={confirmComplete}
+      >
+        Are you sure you want to mark this contract as completed?
+      </Modal>
+
+      {/* Alert Modal */}
+      <Modal
+        isOpen={!!alertConfig}
+        title={alertConfig?.title || 'Alert'}
+        onClose={() => setAlertConfig(null)}
+      >
+        {alertConfig?.message}
+      </Modal>
     </div>
   );
 }

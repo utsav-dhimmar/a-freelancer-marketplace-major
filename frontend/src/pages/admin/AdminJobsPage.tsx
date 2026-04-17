@@ -9,6 +9,7 @@ import {
   AdminLoading,
   AdminPagination,
   AdminToast,
+  AdminModal,
 } from "./components";
 import { Input, Select } from "../../components/ui";
 
@@ -22,6 +23,10 @@ export function AdminJobsPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<AdminJobFilters>({});
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  // Delete confirmation
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const showToast = (message: string, type: "success" | "error") => {
     const id = ++toastId;
@@ -57,17 +62,25 @@ export function AdminJobsPage() {
     fetchJobs();
   }, [fetchJobs]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Delete this job and all its proposals?")) return;
+  const handleDeleteClick = (id: string) => {
+    setJobToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!jobToDelete) return;
+    setDeleting(true);
     try {
-      await adminApi.deleteJob(id);
+      await adminApi.deleteJob(jobToDelete);
       showToast("Job deleted successfully", "success");
+      setJobToDelete(null);
       fetchJobs();
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Failed to delete job",
         "error",
       );
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -191,7 +204,7 @@ export function AdminJobsPage() {
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-1"
-                          onClick={() => handleDelete(job._id)}
+                          onClick={() => handleDeleteClick(job._id)}
                         >
                           Delete
                         </button>
@@ -212,6 +225,47 @@ export function AdminJobsPage() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AdminModal
+        title="Delete Job"
+        isOpen={!!jobToDelete}
+        onClose={() => !deleting && setJobToDelete(null)}
+        maxWidth="400px"
+        footer={
+          <>
+            <button
+              type="button"
+              className="btn btn-light px-4 rounded-3 border"
+              onClick={() => setJobToDelete(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger px-4 rounded-3 fw-bold"
+              onClick={confirmDelete}
+              disabled={deleting}
+            >
+              {deleting ? "Deleting..." : "Delete Job"}
+            </button>
+          </>
+        }
+      >
+        <div className="text-center py-2">
+          <div className="text-danger mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-briefcase-fill" viewBox="0 0 16 16">
+              <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l.756.273A3.5 3.5 0 0 0 3 9.5V12h10V9.5a3.5 3.5 0 0 0 2.244-3.343L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5z"/>
+              <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V12h-1V9.5a2.5 2.5 0 0 1-5 0V12H6V9.5a2.5 2.5 0 0 1-5 0V12H0v.5z"/>
+            </svg>
+          </div>
+          <h5 className="fw-bold">Delete this job?</h5>
+          <p className="text-muted mb-0 small">
+            This will permanently remove the job and all associated proposals. This action cannot be undone.
+          </p>
+        </div>
+      </AdminModal>
     </AdminLayout>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { jobApi } from '../../api';
-import { Button, Card, Badge, Spinner, EmptyState } from '../../components/ui';
+import { Button, Card, Badge, Spinner, EmptyState, Modal } from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IJob } from '../../types';
@@ -10,6 +10,10 @@ export function MyJobsPage() {
   const {} = useAuth();
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Cancel confirmation state
+  const [jobToCancel, setJobToCancel] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     loadJobs();
@@ -26,13 +30,21 @@ export function MyJobsPage() {
     }
   };
 
-  const handleCancelJob = async (id: string) => {
-    if (!confirm('Are you sure you want to cancel this job? This action cannot be undone.')) return;
+  const handleCancelJob = (id: string) => {
+    setJobToCancel(id);
+  };
+
+  const confirmCancel = async () => {
+    if (!jobToCancel) return;
+    setCancelling(true);
     try {
-      await jobApi.updateStatus(id, 'cancelled');
+      await jobApi.updateStatus(jobToCancel, 'cancelled');
+      setJobToCancel(null);
       loadJobs();
     } catch (error) {
       console.error('Failed to cancel job:', error);
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -162,6 +174,22 @@ export function MyJobsPage() {
           ))}
         </div>
       )}
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        isOpen={!!jobToCancel}
+        title="Cancel Job"
+        variant="confirm"
+        confirmText="Yes, Cancel Job"
+        onClose={() => !cancelling && setJobToCancel(null)}
+        onConfirm={confirmCancel}
+        isLoading={cancelling}
+      >
+        <p>Are you sure you want to cancel this job?</p>
+        <p className="small text-muted mb-0">
+          This action cannot be undone. All active proposals for this job will also be affected.
+        </p>
+      </Modal>
     </div>
   );
 }

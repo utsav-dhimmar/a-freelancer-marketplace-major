@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { freelancerApi, authApi, STATIC_URL } from '../../api';
-import { Card, Button, Input, TextArea } from '../../components/ui';
+import { Card, Button, Input, TextArea, Modal } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IFreelancer, IPortfolioItem } from '../../types';
 import { portfolioItemSchema } from '../../schemas';
@@ -30,6 +30,10 @@ export function MyProfilePage() {
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [portfolioErrors, setPortfolioErrors] = useState<Record<string, string>>({});
+
+  // Deactivate confirmation
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
 
   useEffect(() => {
     loadFreelancer();
@@ -77,13 +81,20 @@ export function MyProfilePage() {
     }
   };
 
-  const handleDeactivateProfile = async () => {
-    if (!confirm('Are you sure you want to deactivate your freelancer profile? This will hide your profile from search results and you will not be able to apply for new jobs. Your user account will remain active.')) return;
+  const handleDeactivateProfile = () => {
+    setShowDeactivateModal(true);
+  };
+
+  const confirmDeactivate = async () => {
+    setDeactivating(true);
     try {
       await freelancerApi.deleteProfile();
       window.location.href = '/dashboard';
     } catch (error) {
       console.error('Failed to deactivate profile:', error);
+    } finally {
+      setDeactivating(false);
+      setShowDeactivateModal(false);
     }
   };
 
@@ -472,6 +483,23 @@ export function MyProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Deactivate Confirmation Modal */}
+      <Modal
+        isOpen={showDeactivateModal}
+        title="Deactivate Profile"
+        variant="confirm"
+        confirmText="Deactivate"
+        onClose={() => !deactivating && setShowDeactivateModal(false)}
+        onConfirm={confirmDeactivate}
+        isLoading={deactivating}
+      >
+        <p>Are you sure you want to deactivate your freelancer profile?</p>
+        <p className="small text-muted mb-0">
+          This will hide your profile from search results and you will not be able to apply for new jobs. 
+          Your user account will remain active.
+        </p>
+      </Modal>
     </div>
   );
 }
