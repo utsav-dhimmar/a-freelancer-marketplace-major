@@ -7,6 +7,7 @@ export interface IPortfolioItem {
   title: string;
   link: string;
   desc: string;
+  imageUrl?: string;
 }
 
 /**
@@ -46,6 +47,10 @@ const portfolioItemSchema = new Schema<IPortfolioItem>(
       type: String,
       trim: true,
       maxlength: [500, 'Portfolio description cannot exceed 500 characters'],
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
     },
   },
   { _id: false },

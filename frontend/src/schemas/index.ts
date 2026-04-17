@@ -76,8 +76,12 @@ export const portfolioItemSchema = z.object({
     .string({ error: 'Description is required' })
     .min(10, 'Description must be at least 10 characters')
     .max(500, 'Description cannot exceed 500 characters'),
-  imageUrl: z.string().url().optional(),
-  link: z.string().url().optional(),
+  imageUrl: z
+    .string({ error: 'Image URL is required' })
+    .url('Please enter a valid image URL'),
+  link: z
+    .string({ error: 'Project link is required' })
+    .url('Please enter a valid project link'),
 });
 
 export const contractWorkSchema = z.object({

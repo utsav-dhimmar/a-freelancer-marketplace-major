@@ -4,6 +4,7 @@ import { freelancerApi, authApi, STATIC_URL } from '../../api';
 import { Card, Button, Input, TextArea } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IFreelancer, IPortfolioItem } from '../../types';
+import { portfolioItemSchema } from '../../schemas';
 import { CURRENCY, formatCurrency } from '../../constants/currency';
 
 export function MyProfilePage() {
@@ -28,6 +29,7 @@ export function MyProfilePage() {
   });
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [portfolioErrors, setPortfolioErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadFreelancer();
@@ -122,12 +124,35 @@ export function MyProfilePage() {
     });
   };
 
+  const validatePortfolioItem = () => {
+    const result = portfolioItemSchema.safeParse(portfolioItem);
+    
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0] as string;
+        errors[path] = issue.message;
+      });
+      setPortfolioErrors(errors);
+      return false;
+    }
+
+    setPortfolioErrors({});
+    return true;
+  };
+
   const handleAddPortfolioItem = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validatePortfolioItem()) return;
+
     try {
-      await freelancerApi.addPortfolioItem(portfolioItem);
+      await freelancerApi.addPortfolioItem({
+        ...portfolioItem,
+        desc: portfolioItem.description,
+      } as any);
       setShowPortfolioForm(false);
       setPortfolioItem({ title: '', description: '', imageUrl: '', link: '' });
+      setPortfolioErrors({});
       loadFreelancer();
     } catch (error) {
       console.error('Failed to add portfolio item:', error);
@@ -265,7 +290,10 @@ export function MyProfilePage() {
               <h5 className="mb-0">Portfolio</h5>
               <Button
                 size="sm"
-                onClick={() => setShowPortfolioForm(!showPortfolioForm)}
+                onClick={() => {
+                  setShowPortfolioForm(!showPortfolioForm);
+                  setPortfolioErrors({});
+                }}
               >
                 {showPortfolioForm ? 'Cancel' : 'Add Item'}
               </Button>
@@ -285,7 +313,7 @@ export function MyProfilePage() {
                       title: e.target.value,
                     })
                   }
-                  required
+                  error={portfolioErrors.title}
                 />
                 <TextArea
                   label="Description"
@@ -296,7 +324,7 @@ export function MyProfilePage() {
                       description: e.target.value,
                     })
                   }
-                  required
+                  error={portfolioErrors.description}
                 />
                 <Input
                   label="Image URL"
@@ -307,6 +335,8 @@ export function MyProfilePage() {
                       imageUrl: e.target.value,
                     })
                   }
+                  error={portfolioErrors.imageUrl}
+                  placeholder="https://example.com/image.jpg"
                 />
                 <Input
                   label="Project Link"
@@ -314,6 +344,8 @@ export function MyProfilePage() {
                   onChange={(e) =>
                     setPortfolioItem({ ...portfolioItem, link: e.target.value })
                   }
+                  error={portfolioErrors.link}
+                  placeholder="https://example.com/project"
                 />
                 <Button type="submit">Add to Portfolio</Button>
               </form>
@@ -325,7 +357,17 @@ export function MyProfilePage() {
                   <div className="card">
                     <div className="card-body">
                       <h6 className="card-title">{item.title}</h6>
-                      <p className="card-text small">{item.description}</p>
+                      <p className="card-text small">
+                        {item.description || (item as any).desc}
+                      </p>
+                      {item.imageUrl && (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="img-fluid rounded mb-2"
+                          style={{ maxHeight: '150px', objectFit: 'cover' }}
+                        />
+                      )}
                       {item.link && (
                         <a
                           href={item.link}

@@ -22,7 +22,7 @@ export const createJobSchema = z.object({
     .array(z.string())
     .min(1, 'At least one skill is required')
     .default([]),
-  deadline: z.string().optional(),
+  deadline: z.string({ error: 'Deadline is required' }),
 });
 
 export const updateJobSchema = createJobSchema.partial();

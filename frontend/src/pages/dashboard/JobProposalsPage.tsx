@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { proposalApi, jobApi } from '../../api';
-import { Card, Button } from '../../components/ui';
+import { Card, Button, DateDisplay } from '../../components/ui';
 import type { IProposal, IJob } from '../../types';
 import { formatCurrency } from '../../constants/currency';
 
@@ -104,9 +104,12 @@ export function JobProposalsPage() {
 
       <div className="mb-4">
         <h2>Proposals for: {job.title}</h2>
-        <div className="text-muted">
-          Budget: {formatCurrency(job.budget)}
-          {job.budgetType === 'fixed' ? ' (Fixed Price)' : ' (Hourly)'}
+        <div className="text-muted d-flex gap-4">
+          <span>
+            <strong>Budget:</strong> {formatCurrency(job.budget)}
+            {job.budgetType === 'fixed' ? ' (Fixed Price)' : ' (Hourly)'}
+          </span>
+          <DateDisplay date={job.deadline} label="Deadline:" variant="primary" />
         </div>
       </div>
 

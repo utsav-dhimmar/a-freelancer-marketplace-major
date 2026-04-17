@@ -39,7 +39,7 @@ export function ChatPage() {
   const [error, setError] = useState('');
   const [isSocketConnected, setIsSocketConnected] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -49,8 +49,9 @@ export function ChatPage() {
   }, [contractId]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // For the initial load, we might want instant scroll
+    scrollToBottom(messages.length > 0 && !loading);
+  }, [messages, loading]);
 
   useEffect(() => {
     if (
@@ -158,8 +159,13 @@ export function ChatPage() {
     });
   }, [messages, contractId, currentUserId]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (smooth = true) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
   };
 
   const loadContractAndMessages = async () => {
@@ -325,6 +331,7 @@ export function ChatPage() {
       >
         {/* Messages */}
         <div
+          ref={scrollContainerRef}
           className="card-body"
           style={{
             flex: 1,
@@ -390,7 +397,6 @@ export function ChatPage() {
               );
             })
           )}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}

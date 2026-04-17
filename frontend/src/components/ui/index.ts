@@ -6,3 +6,4 @@ export { TextArea } from './TextArea';
 export { Badge } from './Badge';
 export { Spinner } from './Spinner';
 export { EmptyState } from './EmptyState';
+export { DateDisplay } from './DateDisplay';

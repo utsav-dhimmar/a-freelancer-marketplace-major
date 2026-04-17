@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Card, Button, Input } from '../../components/ui';
+import { Card, Button, Input, DateDisplay } from '../../components/ui';
 import { authApi, STATIC_URL } from '../../api';
 
 export function ProfilePage() {
@@ -135,7 +135,7 @@ export function ProfilePage() {
                 <p className="small text-muted mb-0">
                   <i className="bi bi-info-circle me-2"></i>
                   Account type: <strong>{user.role}</strong>. Member since{' '}
-                  {new Date(user.createdAt).toLocaleDateString()}.
+                  <DateDisplay date={user.createdAt} />
                 </p>
               </div>
             </div>

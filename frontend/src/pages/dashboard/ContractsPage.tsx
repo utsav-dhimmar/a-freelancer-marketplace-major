@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Card,
+  DateDisplay,
   EmptyState,
   Spinner,
   TextArea,
@@ -52,7 +53,7 @@ export function ContractsPage() {
         try {
           const hasReviewed = await reviewApi.checkReviewed(c._id);
           if (hasReviewed) reviewed.add(c._id);
-        } catch {}
+        } catch { }
       }
       setReviewedContracts(reviewed);
     } catch (error) {
@@ -204,7 +205,7 @@ export function ContractsPage() {
                   <small className="text-muted">
                     {' '}
                     | Started:{' '}
-                    {new Date(contract.startDate).toLocaleDateString()}
+                    <DateDisplay date={contract.startDate} />
                   </small>
                 </div>
                 {contract.workSubmitted && (

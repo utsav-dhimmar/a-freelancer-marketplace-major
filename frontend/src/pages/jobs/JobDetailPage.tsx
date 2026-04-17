@@ -1,7 +1,7 @@
 import { type SyntheticEvent, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { jobApi, proposalApi } from '../../api';
-import { Button, Input, TextArea } from '../../components/ui';
+import { Button, Input, TextArea, DateDisplay } from '../../components/ui';
 import { CURRENCY, formatCurrency } from '../../constants/currency';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IJob, IProposal } from '../../types';
@@ -129,12 +129,10 @@ export function JobDetailPage() {
               <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
                 <div>
                   <h1 className="h3 mb-1">{job.title}</h1>
-                  <div className="text-muted small">
-                    Posted {new Date(job.createdAt).toLocaleDateString()}
-                    <span className="text-muted mx-2">•</span>
-                    Deadline{' '}
-                    {new Date(job.deadline).toLocaleDateString() ||
-                      job.deadline}
+                  <div className="text-muted d-flex align-items-center gap-2">
+                    <DateDisplay date={job.createdAt} label="Posted" />
+                    <span className="text-muted">•</span>
+                    <DateDisplay date={job.deadline} label="Deadline" variant="primary" />
                   </div>
                 </div>
                 {renderStatusBadge(job.status)}
@@ -170,9 +168,7 @@ export function JobDetailPage() {
                   </div>
                   <div className="col-6">
                     <div className="text-muted small mb-1">Deadline</div>
-                    <p className="mb-0">
-                      {new Date(job.deadline).toLocaleDateString()}
-                    </p>
+                    <DateDisplay date={job.deadline} variant="primary" />
                   </div>
                 </div>
               </div>

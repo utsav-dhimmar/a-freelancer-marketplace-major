@@ -9,7 +9,7 @@ export interface CreateJobData {
   budget: number;
   budgetType: 'fixed' | 'hourly';
   skillsRequired?: string[];
-  deadline?: Date;
+  deadline: Date;
 }
 
 /**

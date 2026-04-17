@@ -9,6 +9,7 @@ import {
   EmptyState,
   Input,
   Select,
+  DateDisplay,
 } from '../../components/ui';
 import { formatCurrency } from '../../constants/currency';
 import type { IJob, JobStatus } from '../../types';
@@ -203,7 +204,10 @@ export function JobsListPage() {
                 >
                   <div className="card-body d-flex flex-column">
                     <div className="d-flex justify-content-between align-items-start mb-3 gap-2">
-                      <h3 className="h5 mb-0">{job.title}</h3>
+                      <div>
+                        <h3 className="h5 mb-1">{job.title}</h3>
+                        <DateDisplay date={job.createdAt} />
+                      </div>
                       <Badge
                         variant={statusBadgeVariants[job.status] || 'secondary'}
                         className="text-uppercase"
@@ -241,11 +245,10 @@ export function JobsListPage() {
                             {job.budgetType === 'hourly' ? ' /hr' : ' fixed'}
                           </span>
                         </p>
-                        {job.deadline && (
-                          <p className="mb-0 text-muted small">
-                            Deadline: {new Date(job.deadline).toLocaleDateString()}
-                          </p>
-                        )}
+                          <DateDisplay 
+                            date={job.deadline} 
+                            label="Deadline:" 
+                          />
                       </div>
                       <Button variant="outline-secondary" size="sm">
                         View Details

@@ -9,7 +9,7 @@ export interface IJob extends Document {
   budgetType: 'fixed' | 'hourly';
   skillsRequired: string[];
   status: 'open' | 'in_progress' | 'completed' | 'cancelled';
-  deadline?: Date;
+  deadline: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +60,7 @@ const jobSchema = new Schema<IJob>(
     },
     deadline: {
       type: Date,
+      required: [true, 'Deadline is required'],
     },
   },
   {

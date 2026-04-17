@@ -189,6 +189,7 @@ export function CreateJobPage() {
                 label="Deadline"
                 type="date"
                 {...register('deadline')}
+                min={new Date().toISOString().split('T')[0]}
                 error={errors.deadline?.message}
               />
 

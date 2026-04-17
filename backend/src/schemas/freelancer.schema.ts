@@ -9,6 +9,10 @@ export const portfolioItemSchema = z.object({
     .string({ error: 'Portfolio link is required' })
     .url('Please enter a valid URL')
     .trim(),
+  imageUrl: z
+    .string()
+    .url('Please enter a valid image URL')
+    .optional(),
   desc: z
     .string()
     .trim()
