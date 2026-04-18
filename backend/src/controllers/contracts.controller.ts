@@ -2,6 +2,7 @@ import type { NextFunction, Response } from 'express';
 import { HTTP_STATUS } from '../constants/index.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 import { contractService } from '../services/contracts.service.js';
+import { emailService } from '../services/email.service.js';
 import { freelancerService } from '../services/freelancer.service.js';
 import { jobService } from '../services/job.service.js';
 import { proposalService } from '../services/proposals.service.js';
@@ -134,6 +135,30 @@ export const createContract = asyncHandler(
       proposal: proposalId,
       amount: proposal.bidAmount,
     });
+
+    // Send contract creation emails (async)
+    const jobTitle = (proposal.job as any).title;
+    const clientEmail = (contract.client as any).email;
+    const clientName = (contract.client as any).fullname;
+    const freelancerEmail = (contract.freelancer as any).email;
+    const freelancerName = (contract.freelancer as any).fullname;
+
+    if (freelancerEmail) {
+      emailService.sendContractCreatedEmail(
+        freelancerEmail,
+        freelancerName,
+        clientName,
+        jobTitle,
+      );
+    }
+    if (clientEmail) {
+      emailService.sendContractCreatedEmail(
+        clientEmail,
+        clientName,
+        freelancerName,
+        jobTitle,
+      );
+    }
 
     res.status(HTTP_STATUS.CREATED).json(
       new ApiResponse(HTTP_STATUS.CREATED, 'Contract created successfully', {
@@ -289,6 +314,30 @@ export const completeContract = asyncHandler(
       const freelancerId =
         (contract.freelancer as any)._id || contract.freelancer;
       await freelancerService.incrementTotalJobs(String(freelancerId));
+
+      // Send contract completion emails (async)
+      const jobTitle = (contract.job as any).title;
+      const clientEmail = (contract.client as any).email;
+      const clientName = (contract.client as any).fullname;
+      const freelancerEmail = (contract.freelancer as any).email;
+      const freelancerName = (contract.freelancer as any).fullname;
+
+      if (freelancerEmail) {
+        emailService.sendContractCompletedEmail(
+          freelancerEmail,
+          freelancerName,
+          clientName,
+          jobTitle,
+        );
+      }
+      if (clientEmail) {
+        emailService.sendContractCompletedEmail(
+          clientEmail,
+          clientName,
+          freelancerName,
+          jobTitle,
+        );
+      }
     }
 
     res.status(HTTP_STATUS.OK).json(

@@ -122,6 +122,80 @@ class EmailService {
       return false;
     }
   }
+
+  /**
+   * Send email when a contract is created
+   */
+  async sendContractCreatedEmail(
+    to: string,
+    receiverName: string,
+    otherPartyName: string,
+    jobTitle: string,
+  ): Promise<boolean> {
+    try {
+      const mailOptions = {
+        from:
+          process.env.FROM_EMAIL ||
+          '"Freelancer Marketplace" <noreply@freelancermarketplace.com>',
+        to,
+        subject: 'New Contract Started',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <h2 style="color: #333;">Hi ${receiverName},</h2>
+            <p>A new contract has been created for the job "<strong>${jobTitle}</strong>" with <strong>${otherPartyName}</strong>.</p>
+            <p>You can now manage the contract and communicate through the dashboard.</p>
+            <br/>
+            <p>Best regards,</p>
+            <p><strong>The Freelancer Marketplace Team</strong></p>
+          </div>
+        `,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Contract creation email sent to: ${to}`);
+      return true;
+    } catch (error) {
+      console.error('Error sending contract creation email:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Send email when a contract is completed
+   */
+  async sendContractCompletedEmail(
+    to: string,
+    receiverName: string,
+    otherPartyName: string,
+    jobTitle: string,
+  ): Promise<boolean> {
+    try {
+      const mailOptions = {
+        from:
+          process.env.FROM_EMAIL ||
+          '"Freelancer Marketplace" <noreply@freelancermarketplace.com>',
+        to,
+        subject: 'Contract Completed!',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <h2 style="color: #333;">Great news, ${receiverName}!</h2>
+            <p>The contract for the job "<strong>${jobTitle}</strong>" with <strong>${otherPartyName}</strong> has been marked as completed.</p>
+            <p>Please don't forget to leave a review for your experience.</p>
+            <br/>
+            <p>Best regards,</p>
+            <p><strong>The Freelancer Marketplace Team</strong></p>
+          </div>
+        `,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Contract completion email sent to: ${to}`);
+      return true;
+    } catch (error) {
+      console.error('Error sending contract completion email:', error);
+      return false;
+    }
+  }
 }
 
 export const emailService = new EmailService();

@@ -1,3 +1,1 @@
-hey 
-1. include the reviews in profile page also add in api as well so out of 5 aka display average rating and total number of reviews as well.
-2. create routes which should client or freelancer info only and display using that api when click on UserProfile components name
+Hey current version of the app only send email after register which is good i need email also send freelancer send proposal then send email to client and proposal became contract send email to client and frellancer both and when contract complete send email to both

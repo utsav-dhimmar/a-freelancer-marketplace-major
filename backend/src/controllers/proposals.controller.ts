@@ -3,6 +3,7 @@ import type { ObjectId } from 'mongoose';
 import { HTTP_STATUS } from '../constants/index.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 import { contractService } from '../services/contracts.service.js';
+import { emailService } from '../services/email.service.js';
 import { jobService } from '../services/job.service.js';
 import { proposalService } from '../services/proposals.service.js';
 import { ApiError, ApiResponse } from '../utils/ApiHelper.js';
@@ -165,6 +166,16 @@ export const createProposal = asyncHandler(
       estimatedTime,
     });
 
+    // Send email to client (async)
+    if (jobDoc.client && (jobDoc.client as any).email) {
+      emailService.sendNewProposalEmail(
+        (jobDoc.client as any).email,
+        (jobDoc.client as any).fullname,
+        jobDoc.title,
+        req.user.fullname,
+      );
+    }
+
     res.status(HTTP_STATUS.CREATED).json(
       new ApiResponse(HTTP_STATUS.CREATED, 'Proposal submitted successfully', {
         proposal,
@@ -276,6 +287,30 @@ export const updateProposalStatus = asyncHandler(
           proposal: id,
           amount: proposal.bidAmount,
         });
+
+        // Send contract creation emails (async)
+        const jobTitle = (proposal.job as any).title;
+        const clientEmail = req.user.email;
+        const clientName = req.user.fullname;
+        const freelancerEmail = (proposal.freelancer as any).email;
+        const freelancerName = (proposal.freelancer as any).fullname;
+
+        if (freelancerEmail) {
+          emailService.sendContractCreatedEmail(
+            freelancerEmail,
+            freelancerName,
+            clientName,
+            jobTitle,
+          );
+        }
+        if (clientEmail) {
+          emailService.sendContractCreatedEmail(
+            clientEmail,
+            clientName,
+            freelancerName,
+            jobTitle,
+          );
+        }
       }
     }
 
