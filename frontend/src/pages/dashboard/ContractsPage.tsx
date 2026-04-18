@@ -34,8 +34,8 @@ export function ContractsPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewedContracts, setReviewedContracts] = useState<Set<string>>(
-    new Set(),
+  const [contractReviews, setContractReviews] = useState<Record<string, IReview[]>>(
+    {},
   );
 
   // New Modal States
@@ -52,18 +52,20 @@ export function ContractsPage() {
       const data = await contractApi.getMyContracts();
       setContracts(data);
 
-      // Check which completed contracts have already been reviewed
+      // Fetch reviews for completed contracts
       const completedContracts = data.filter(
         (c: IContract) => c.status === 'completed',
       );
-      const reviewed = new Set<string>();
+      const reviewsMap: Record<string, IReview[]> = {};
       for (const c of completedContracts) {
         try {
-          const hasReviewed = await reviewApi.checkReviewed(c._id);
-          if (hasReviewed) reviewed.add(c._id);
-        } catch { }
+          const reviews = await reviewApi.getByContract(c._id);
+          reviewsMap[c._id] = reviews;
+        } catch (error) {
+          console.error(`Failed to load reviews for contract ${c._id}:`, error);
+        }
       }
-      setReviewedContracts(reviewed);
+      setContractReviews(reviewsMap);
     } catch (error) {
       console.error('Failed to load contracts:', error);
     } finally {
@@ -130,12 +132,18 @@ export function ContractsPage() {
 
     setReviewSubmitting(true);
     try {
-      await reviewApi.create({
+      const newReview = await reviewApi.create({
         contractId: reviewContract._id,
         rating: reviewRating,
         comment: reviewComment || undefined,
       });
-      setReviewedContracts((prev) => new Set(prev).add(reviewContract._id));
+
+      // Update local state with the new review
+      setContractReviews((prev) => ({
+        ...prev,
+        [reviewContract._id]: [...(prev[reviewContract._id] || []), newReview],
+      }));
+
       setReviewContract(null);
       setReviewRating(5);
       setReviewComment('');
@@ -196,9 +204,9 @@ export function ContractsPage() {
                 </div>
 
                 <div className="mb-3">
-                  <UserProfileCard 
-                    user={user?.role === 'client' ? contract.freelancer : contract.client} 
-                    variant="mini" 
+                  <UserProfileCard
+                    user={user?.role === 'client' ? contract.freelancer : contract.client}
+                    variant="mini"
                   />
                 </div>
                 {contract.workSubmitted && (
@@ -221,67 +229,115 @@ export function ContractsPage() {
                   {/* Actions for Active / Submitted contracts */}
                   {(contract.status === 'active' ||
                     contract.status === 'submitted') && (
-                    <>
-                      {/* Freelancer: Submit work (only if active) */}
-                      {user?.role !== 'client' && contract.status === 'active' && (
+                      <>
+                        {/* Freelancer: Submit work (only if active) */}
+                        {user?.role !== 'client' && contract.status === 'active' && (
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedContract(contract)}
+                          >
+                            Submit Work
+                          </Button>
+                        )}
+
+                        {/* Client: Mark Complete (only if submitted) */}
+                        {user?.role === 'client' && contract.status === 'submitted' && (
+                          <Button
+                            size="sm"
+                            variant="success"
+                            onClick={() => handleComplete(contract._id)}
+                          >
+                            Mark Complete
+                          </Button>
+                        )}
+
+                        {/* Both: Raise Dispute */}
                         <Button
                           size="sm"
-                          onClick={() => setSelectedContract(contract)}
-                        >
-                          Submit Work
-                        </Button>
-                      )}
-
-                      {/* Client: Mark Complete (only if submitted) */}
-                      {user?.role === 'client' && contract.status === 'submitted' && (
-                        <Button
-                          size="sm"
-                          variant="success"
-                          onClick={() => handleComplete(contract._id)}
-                        >
-                          Mark Complete
-                        </Button>
-                      )}
-
-                      {/* Both: Raise Dispute */}
-                      <Button
-                        size="sm"
-                        variant="outline-danger"
-                        onClick={() => {
-                          setSelectedContract({
-                            ...contract,
-                            status: 'disputed',
-                          } as any);
-                        }}
-                      >
-                        Raise Dispute
-                      </Button>
-                    </>
-                  )}
-
-                  {contract.status === 'completed' && (
-                    <>
-                      {!reviewedContracts.has(contract._id) ? (
-                        <Button
-                          size="sm"
-                          variant="warning"
+                          variant="outline-danger"
                           onClick={() => {
-                            setReviewContract(contract);
-                            setReviewRating(5);
-                            setReviewComment('');
+                            setSelectedContract({
+                              ...contract,
+                              status: 'disputed',
+                            } as any);
                           }}
                         >
-                          ⭐ Leave Review
+                          Raise Dispute
                         </Button>
-                      ) : (
-                        <span
-                          className="text-success small d-flex align-items-center"
-                          style={{ alignSelf: 'center' }}
-                        >
-                          ✓ Reviewed
-                        </span>
+                      </>
+                    )}
+
+                  {contract.status === 'completed' && (
+                    <div className="w-100 mt-2">
+                      <div className="d-flex flex-wrap gap-2 mb-2">
+                        {/* Show "Leave Review" button only if I haven't reviewed yet */}
+                        {!(contractReviews[contract._id] || []).some((r) => {
+                          const reviewerId =
+                            typeof r.reviewer === 'object'
+                              ? r.reviewer._id || r.reviewer.id
+                              : r.reviewer;
+                          const currentUserId = user?._id || user?.id;
+                          return String(reviewerId) === String(currentUserId);
+                        }) ? (
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => {
+                              setReviewContract(contract);
+                              setReviewRating(5);
+                              setReviewComment('');
+                            }}
+                          >
+                            ⭐ Leave Review
+                          </Button>
+                        ) : (
+                          <span className="text-success small d-flex align-items-center">
+                            ✓ You have reviewed
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Display reviews if any exist */}
+                      {(contractReviews[contract._id] || []).length > 0 && (
+                        <div className="bg-light p-3 rounded border">
+                          <h6 className="small fw-bold mb-2">Reviews:</h6>
+                          {(contractReviews[contract._id] || []).map((r) => {
+                            const reviewerId =
+                              typeof r.reviewer === 'object'
+                                ? r.reviewer._id || r.reviewer.id
+                                : r.reviewer;
+                            const currentUserId = user?._id || user?.id;
+                            const isMyReview =
+                              String(reviewerId) === String(currentUserId);
+                            return (
+                              <div
+                                key={r._id}
+                                className={`mb-2 pb-2 ${isMyReview ? 'border-bottom-0' : 'border-bottom'
+                                  }`}
+                              >
+                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                  <span className="small fw-semibold">
+                                    {typeof r.reviewer === 'object'
+                                      ? `${r.reviewer.role.charAt(0).toUpperCase() +
+                                      r.reviewer.role.slice(1)
+                                      }: ${r.reviewer.fullname || r.reviewer.username
+                                      }`
+                                      : 'User'}{' '}
+                                    {isMyReview && '(You)'}
+                                  </span>
+                                  <StarRating value={r.rating} readonly size="sm" />
+                                </div>
+                                {r.comment && (
+                                  <p className="mb-0 small text-muted fst-italic">
+                                    "{r.comment}"
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       )}
-                    </>
+                    </div>
                   )}
 
                   {contract.status === 'disputed' && (

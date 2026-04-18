@@ -39,6 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: 'btn-link text-secondary',
       danger: 'btn-danger',
       success: 'btn-success',
+      warning: 'btn-warning',
     };
     const sizeClass = size === 'md' ? '' : `btn-${size}`;
     const variantClass = variantMap[variant || 'primary'] ?? variantMap.primary;

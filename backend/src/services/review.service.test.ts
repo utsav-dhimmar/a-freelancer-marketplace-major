@@ -211,4 +211,33 @@ describe('ReviewService', () => {
       expect(result).toHaveLength(1);
     });
   });
+
+  describe('getUserReviewForContract', () => {
+    it('should return the review for a specific reviewer and contract', async () => {
+      const mockReview = { _id: 'review-123', rating: 5 };
+      vi.mocked(Review.findOne).mockResolvedValue(mockReview as any);
+
+      const result = await reviewService.getUserReviewForContract(
+        'user-123',
+        'contract-123',
+      );
+
+      expect(Review.findOne).toHaveBeenCalledWith({
+        reviewer: 'user-123',
+        contract: 'contract-123',
+      });
+      expect(result).toEqual(mockReview);
+    });
+
+    it('should return null if no review is found', async () => {
+      vi.mocked(Review.findOne).mockResolvedValue(null);
+
+      const result = await reviewService.getUserReviewForContract(
+        'user-123',
+        'contract-123',
+      );
+
+      expect(result).toBeNull();
+    });
+  });
 });

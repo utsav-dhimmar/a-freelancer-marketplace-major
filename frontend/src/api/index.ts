@@ -504,11 +504,13 @@ export const reviewApi = {
     return response.data.data.reviews;
   },
 
-  checkReviewed: async (contractId: string) => {
-    const response = await api.get<ApiResponse<{ hasReviewed: boolean }>>(
-      `/reviews/check/${contractId}`,
-    );
-    return response.data.data.hasReviewed;
+  checkReviewed: async (
+    contractId: string,
+  ): Promise<{ hasReviewed: boolean; review?: IReview }> => {
+    const response = await api.get<
+      ApiResponse<{ hasReviewed: boolean; review?: IReview }>
+    >(`/reviews/check/${contractId}`);
+    return response.data.data;
   },
 };
 

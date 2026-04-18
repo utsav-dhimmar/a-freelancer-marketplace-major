@@ -112,14 +112,15 @@ export const checkReviewed = asyncHandler(
     }
 
     const contractId = req.params.contractId as string;
-    const hasReviewed = await reviewService.hasUserReviewedContract(
+    const review = await reviewService.getUserReviewForContract(
       String(req.user._id),
       contractId,
     );
 
     res.status(HTTP_STATUS.OK).json(
       new ApiResponse(HTTP_STATUS.OK, 'Review check completed', {
-        hasReviewed,
+        hasReviewed: !!review,
+        review,
       }),
     );
   },

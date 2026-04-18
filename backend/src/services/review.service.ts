@@ -145,17 +145,16 @@ export class ReviewService {
   }
 
   /**
-   * Check if a user has already reviewed for a specific contract
+   * Get a user's review for a specific contract
    */
-  async hasUserReviewedContract(
+  async getUserReviewForContract(
     userId: string,
     contractId: string,
-  ): Promise<boolean> {
-    const review = await Review.findOne({
+  ): Promise<IReview | null> {
+    return Review.findOne({
       reviewer: userId,
       contract: contractId,
     });
-    return review !== null;
   }
 }
 
